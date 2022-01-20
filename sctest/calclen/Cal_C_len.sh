@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/cal_C_len.py /SGRNJ03/randd/RD20073101_SCOPEv2_TCR/20211104_3/H_1022PV2_5min_2NL150

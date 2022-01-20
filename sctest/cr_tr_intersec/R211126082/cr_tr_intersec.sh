@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/cr_tr_intersec.py /SGRNJ03/randd/RD20073101_SCOPEv2_TCR/20211203_1/BJ_1116PzB_AutoV1_3Nlib/ /SGRNJ03/randd/cjj/celedev/trust4/20211206/2/BJ1116-1

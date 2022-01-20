@@ -1,0 +1,8 @@
+sample_name:M_1020BM1_150_15_3Nlib
+barcode_reads_count:20261467
+total_reads:62637481
+percent:32.35%
+sample_name:M_0924PzB1_XBDh_3Nlib
+barcode_reads_count:39007081
+total_reads:69249885
+percent:56.330000000000005%

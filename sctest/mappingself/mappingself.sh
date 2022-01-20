@@ -1,0 +1,1 @@
+Rscript /SGRNJ03/randd/cjj/Script/mappingself/mappingself.R --sample JS-CFL-IT --rds /SGRNJ03/PROJ03/PROJ_20.SC/P21102803_SCOPEv2/temp/JS-CFL-IT_auto/JS-CFL-IT/JS-CFL-IT_anno/annotation/JS-CFL-IT.CellID_annotation.rds --VDJ /SGRNJ03/PROJ03/PROJ_20.Other/P21102803_fl-BCR/JS-CFL-IT-B/JS-CFL-IT-B/03.assemble/match/match_contigs.csv --outdir ./

@@ -1,0 +1,1 @@
+Rscript /SGRNJ03/randd/cjj/Script/mapping.R --rds /SGRNJ03/randd/RD20040201_SCOPEv2_TCR/20211029/H_1020PV2_1_5min_NL/06.analysis/H_1020PV2_1_5min_NL.rds --VDJ /SGRNJ03/randd/RD20073101_SCOPEv2_TCR/20211104_2/H_1020PV2_1_5min_2NL150/03.assemble/match/match_contigs.csv

@@ -1,0 +1,2 @@
+total_contigs : 3844
+average_C_len : 136.21

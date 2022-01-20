@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/Celltype_umi.py  /SGRNJ03/randd/RD20040201_SCOPEv2_TCR/20211205/cmulti/spleen.diff_PRO.rds /SGRNJ03/randd/cjj/celedev/trust4/20211206/2/BJ1116-1/04.summarize/BJ1116-1_all_contig.csv

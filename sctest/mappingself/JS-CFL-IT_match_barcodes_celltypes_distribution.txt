@@ -1,0 +1,13 @@
+Var1,Freq
+MPs,3
+Neutrophils,2
+TCells,7
+PlasmaCells,194
+MastCells,1
+inferred_pDCs,2
+Fibroblasts,0
+BCells,3
+pDCs,1
+AT2,1
+MuralCells,0
+ECs,0

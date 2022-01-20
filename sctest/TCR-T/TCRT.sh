@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/TCR_T/TCRT.py GASD28_24_ZL /SGRNJ03/randd/RD20102301_DZH/TCR-T/20211227/integration_2/amulti/GASD28_24_ZL.diff_PRO.rds /SGRNJ03/randd/RD20102301_DZH/TCR-T/20211228_3/GASD28_24_TCRT_FJ/06.analysis_capture_virus/GASD28_24_TCRT_FJ_auto_UMI_count.tsv
