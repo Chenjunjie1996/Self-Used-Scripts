@@ -1,0 +1,7 @@
+1.分别从file1，file2 中选取UMI占比最高的前N(10000)个tag，分别记为tagA集合,tagB集合；
+2.将tagA集合去除与tagB集合相同的tag,得到tagA1集合
+3.将file3中的tag去除umi占比高的前100个tag后得到tagC集合
+4.取tagA1和tagC集合的并集，记为tagA1C集合
+5，将tagA1C集合去除连续3个及以上碱基相同的tag
+6，去除tag序列之间汉明距离小于或等于4的tag
+7，输出符合上述要求的tag序列，若满足条件的tag序列的种类小于96种，可适当提高N值
