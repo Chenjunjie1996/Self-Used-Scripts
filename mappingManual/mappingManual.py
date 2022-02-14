@@ -30,8 +30,8 @@ def parse_file(rds,contig_file):
     contigs = contig_file.strip().split(",")
     contig_list = []
     for contig in contigs:
-        if os.path.exists(f'{contig}/03.assemble/match/match_contigs.csv'):
-            contig_file = glob.glob(f'{contig}/03.assemble/match/match_contigs.csv')[0]
+        if os.path.exists(f'{contig}/05.match/match_contigs.csv'):
+            contig_file = glob.glob(f'{contig}/05.match/match_contigs.csv')[0]
             contig_list.append(contig_file)
         elif os.path.exists(f'{contig}/04.summarize'):
             contig_file = glob.glob(f'{contig}/04.summarize/*_filtered_contig.csv')[0]
