@@ -24,9 +24,9 @@ def parse_bam(out_path):
             end_pos_list.append(read.reference_end)
     bam.close()
 
-    start_index = max(start_pos_list) / 100
+    # start_index = max(start_pos_list) / 100
     end_index = max(end_pos_list) / 100
-    start_list = [round(j/start_index) for j in start_pos_list]
+    start_list = [round(j/end_index) for j in start_pos_list]
     end_list = [round(j/end_index) for j in end_pos_list]
     count_dic = defaultdict(int)
     for i in range(len(start_list)):
