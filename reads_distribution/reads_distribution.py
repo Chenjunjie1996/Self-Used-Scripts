@@ -1,10 +1,10 @@
 import pysam
 import pandas as pd
+import numpy as np
 import argparse
 import glob
-from collections import Counter
+from collections import defaultdict
 import matplotlib.pyplot as plt
-import numpy as np
 import os
 
 
@@ -16,28 +16,37 @@ def parse_bam(out_path):
     filter_contig = contig[contig['productive'] == True]
     pro_dict = filter_contig.groupby('contig_id')['length'].apply(lambda x: x.tolist()).to_dict()
     pro_contig = list(pro_dict.keys())
-    pos_list = []
+    start_pos_list, end_pos_list = [], []
     bam = pysam.AlignmentFile(bam_file, "rb")
     for read in bam:
         if str(read.reference_name) in pro_contig:
-            pos_list.append(read.reference_start)
+            start_pos_list.append(read.reference_start)
+            end_pos_list.append(read.reference_end)
     bam.close()
-    return pos_list
 
+    start_index = max(start_pos_list) / 100
+    end_index = max(end_pos_list) / 100
+    start_list = [round(j/start_index) for j in start_pos_list]
+    end_list = [round(j/end_index) for j in end_pos_list]
+    count_dic = defaultdict(int)
+    for i in range(len(start_list)):
+        for j in range(start_list[i], end_list[i] + 1, 1):
+            count_dic[j] += 1
 
-def make_plot(pos_list, sample_name):
     x_list = [i for i in range(101)]
-    index = max(pos_list) / 100
-    pos_count = [round(j/index) for j in pos_list]
-    dic = Counter(pos_count)
-    if len(dic.keys()) != len(x_list):
-        difference_set = set(x_list) - set(dic.keys())
+    if len(count_dic.keys()) != len(x_list):
+        difference_set = set(x_list) - set(count_dic.keys())
         for i in difference_set:
-            dic[i] = 0
-    sort_dic = sorted(dic.items(), key=lambda dic: dic[0])
+            count_dic[i] = 0
+    sort_dic = sorted(count_dic.items(), key=lambda count_dic: count_dic[0])
     y_list = []
     for i in sort_dic:
         y_list.append(i[1])
+        
+    return x_list, y_list
+
+
+def make_plot(x_list, y_list, sample_name):
 
     plt.figure(figsize=(12, 9))
     plt.grid(linestyle="--")
@@ -66,5 +75,5 @@ if __name__ == '__main__':
     out_path = args.out_path
     sample_name = os.path.abspath(f"{out_path}").split('/')[-1]
     os.system(f"mkdir {sample_name}")
-    pos_list = parse_bam(out_path)
-    make_plot(pos_list, sample_name)
+    x_list, y_list = parse_bam(out_path)
+    make_plot(x_list, y_list, sample_name)
