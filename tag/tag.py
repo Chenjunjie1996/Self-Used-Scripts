@@ -1,8 +1,14 @@
 import pandas as pd
 import sys
 import argparse
+import random
 
 
+used_tag = {'CGTGTTAGGGCCGAT','GAGTGGTTGCGCCAT','AAGTTGCCAAGGGCC','TAAGAGCCCGGCAAG','TGACCTGCTTCACGC','GAGACCCGTGGAATC','GTTATGCGACCGCGA',
+           'ATACGCAGGGTCCGA','AGCGGCATTTGGGAC','TCGCCAGCCAAGTCT','ACCAATGGCGCATGG','TCCTCCTAGCAACCC','GGCCGATACTTCAGC','CCGTTCGACTTGGTG',
+           'CGCAAGACACTCCAC','CTGCAACAAGGTCGC'}
+           
+           
 def hamming_distance(string1,string2):
     distance = 0
     length, length2 = len(string1), len(string2)
@@ -44,30 +50,22 @@ def parse_file(file1, file2, file3, N):
                 tagA1C_del_bp.add(i)
                 break
     new_tagA1C = tagA1C - tagA1C_del_bp
-
-    """    
-    for i in range(len(new_tagA1C) - 1):
-        if new_tagA1C[i] in hamming_set:
-            continue
-        for j in range(i + 1, len(new_tagA1C)):
-            if new_tagA1C[j] in hamming_set:
-                continue
-            if hamming_distance(new_tagA1C[i], new_tagA1C[j]) <= 4:
-                hamming_set.add(new_tagA1C[i])
-                hamming_set.add(new_tagA1C[j])
-    """
+    new_tagA1C = list(new_tagA1C)
+    sys.stdout.write('Number of tag after del 3 consecutive same bases : ' + str(len(new_tagA1C)) + '\n')
 
     # del hamming distance <= 4
-    new_tagA1C = list(new_tagA1C)
-    hamming_set = set()
-    for i in range(len(new_tagA1C)):
-        for j in range(len(new_tagA1C)):
+    new_tagA1C = random.sample(new_tagA1C,1000)
+    res = set()
+    for i in range(len(new_tagA1C)-1):
+        for j in range(i+1,len(new_tagA1C)):
             if hamming_distance(new_tagA1C[i],new_tagA1C[j])<=4:
                 break
-            if j == len(new_tagA1C) - 1:
-                hamming_set.add(new_tagA1C[i])
-    res = hamming_set
-    return res
+            if j == len(new_tagA1C)-1:
+                res.add(new_tagA1C[i])
+    result = set(res) - used_tag
+    result = list(result)
+    sys.stdout.write('Number of tag after del hamming distance <= 4 : ' + str(len(result)) + '\n')
+    return result
 
 
 if __name__ == '__main__':
@@ -81,9 +79,9 @@ if __name__ == '__main__':
     file2 = args.file2
     file3 = args.file3
     N = int(args.N)
-    res = parse_file(file1, file2, file3, N)
-    outfile = open("./tag_seq.txt","w")
-    for i in res:
+    result = parse_file(file1, file2, file3, N)
+    result = random.sample(result, 96)
+    outfile = open("./TAG.txt","w")
+    for i in result:
         outfile.write(i + "\n")
     outfile.close()
-    sys.stdout.write('REQUIRED TAG NUMBER : ' + len(res) + '\n')
