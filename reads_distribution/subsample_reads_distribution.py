@@ -27,13 +27,13 @@ def parse_bam(out_path):
     bam = pysam.AlignmentFile(bam_file, "rb")
     read_limit = 0
     for read in bam:
-        if str(read.reference_name) in pro_contig:
-            read_limit += 1
-            if read_limit <= 10000000:
+        if read_limit <= 10000000:
+            if str(read.reference_name) in pro_contig:
+                read_limit += 1
                 start_pos_list.append(read.reference_start)
                 end_pos_list.append(read.reference_end)
-            else:
-                break
+        else:
+            break
     bam.close()
 
     # start_index = max(start_pos_list) / 100
