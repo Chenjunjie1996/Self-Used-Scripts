@@ -8,11 +8,16 @@ import matplotlib
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 import os
+from concurrent.futures import ProcessPoolExecutor
 
 
 def parse_bam(out_path):
-    contig_file = glob.glob(f'{out_path}//03.assemble/*/outs/filtered_contig_annotations.csv')[0]
-    bam_file = glob.glob(f'{out_path}//03.assemble/*/outs/all_contig.bam')[0]
+    try:
+        contig_file = glob.glob(f'{out_path}//03.assemble/*/outs/filtered_contig_annotations.csv')[0]
+        bam_file = glob.glob(f'{out_path}//03.assemble/*/outs/all_contig.bam')[0]
+    except:
+        contig_file = glob.glob(f'{out_path}//*/outs/filtered_contig_annotations.csv')[0]
+        bam_file = glob.glob(f'{out_path}//*/outs/all_contig.bam')[0]
 
     contig = pd.read_csv(contig_file)
     filter_contig = contig[contig['productive'] == True]
@@ -44,18 +49,29 @@ def parse_bam(out_path):
     y_list = []
     for i in sort_dic:
         y_list.append(i[1])
-        
-    return x_list, y_list
+
+    return y_list
 
 
-def make_plot(x_list, y_list, sample_name):
+def multi_run(out_SGR, out_10X):
+    out_path_list = [out_SGR, out_10X]
+    result = []
+    with ProcessPoolExecutor(4) as pool:
+        for res in pool.map(parse_bam, out_path_list):
+            result.append(res)
+    return result[0], result[1]
 
+
+def make_plot(y_list_SGR, y_list_10X,  sample_name_SGR, sample_name_10X):
+
+    x_list = [i for i in range(101)]
     plt.figure(figsize=(12, 9))
     plt.grid(linestyle="--")
     ax = plt.gca()
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    plt.plot(x_list, y_list, linewidth=1.5, color='red', label=sample_name)
+    plt.plot(x_list, y_list_SGR, linewidth=1.5, color='red', label=f"SGR_{sample_name_SGR}")
+    plt.plot(x_list, y_list_10X, linewidth=1.5, color='blue', label=f"10X_{sample_name_10X}")
 
     plt.title("Mapped Reads Distribution", fontsize=20)
     plt.xlabel("Length of Assembled chain (%)", fontsize=12)
@@ -67,15 +83,19 @@ def make_plot(x_list, y_list, sample_name):
     ltext = leg.get_texts()
     plt.setp(ltext, fontsize=12, fontweight='bold')
 
-    plt.savefig(f"{sample_name}/mapped_reads_distribution.png", bbox_inches='tight', dpi=300)
+    plt.savefig("./Mapped_reads_distribution/mapped_reads_distribution.png", bbox_inches='tight', dpi=300)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='reads distribution')
-    parser.add_argument('--out_path', help='file1', required=True)
+    parser.add_argument('--out_path1', help='SGR path', required=True)
+    parser.add_argument('--out_path2', help='10X', required=True)
     args = parser.parse_args()
-    out_path = args.out_path
-    sample_name = os.path.abspath(f"{out_path}").split('/')[-1]
-    os.system(f"mkdir {sample_name}")
-    x_list, y_list = parse_bam(out_path)
-    make_plot(x_list, y_list, sample_name)
+    out_SGR = args.out_path1
+    out_10X = args.out_path2
+    os.system(f"mkdir Mapped_reads_distribution")
+
+    sample_name_SGR = os.path.abspath(f"{out_SGR}").split('/')[-1]
+    sample_name_10X = os.path.abspath(f"{out_10X}").split('/')[-1]
+    y_list_SGR, y_list_10X = multi_run(out_SGR, out_10X)
+    make_plot(y_list_SGR, y_list_10X,  sample_name_SGR, sample_name_10X)

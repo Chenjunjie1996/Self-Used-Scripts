@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/reads_distribution/multi_reads_distribution.py --out_path1 /SGRNJ03/randd/RD20073101_SCOPEv2_TCR/20220214/M_0125pz_G_45min_3NL --out_path2 /SGRNJ03/PROJ03/PROJ_20.10X/P21022002_VDJ/20210514/WYX_T/
