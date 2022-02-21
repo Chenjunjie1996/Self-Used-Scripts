@@ -1,1 +1,0 @@
-python /SGRNJ03/randd/cjj/celedev/vdj10x/20220221readdist_compare/sctest/run.py --out_path1 /SGRNJ03/randd/cjj/celedev/vdj10x/20220216splitr2/TCR/Hu_1_0421jc_3Nlib1/ --out_path2 /SGRNJ03/PROJ03/PROJ_20.10X/P21022002_VDJ/20210514/WYX_T --read_limit 1000000
