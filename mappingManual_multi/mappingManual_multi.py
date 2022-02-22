@@ -38,8 +38,8 @@ def parse_file(contig_file):
 
     return contig_list, contig_name_list
 
-def parse_meta(mapping_cell_type):
-    meta_list = glob.glob("./mappingManual_multi/*_meta.csv")
+def parse_meta(mapping_cell_type, outdir):
+    meta_list = glob.glob(f"./{outdir}/*_meta.csv")
     sample_list = ['_'.join(i.split('/')[-1].split('_')[:-1]) for i in meta_list]
 
     report = xlwt.Workbook()
@@ -70,7 +70,7 @@ def parse_meta(mapping_cell_type):
         sheet.write(_i+1, 2, ZL_count[_i])
         sheet.write(_i+1, 3, percent[_i])
 
-    report.save('./mappingManual_multi/mapping_count.xls')
+    report.save(f'./{outdir}/mapping_count.xls')
     return report
 
 def main():
@@ -83,7 +83,7 @@ def main():
     contig_file = args.contig_file
     rds = args.rds
     sample_name = args.sample_name
-    outdir = "./mappingManual_multi"
+    outdir = f"./mappingManual_{sample_name}"
     os.system(f"mkdir {outdir}")
     contig_list, contig_name_list = parse_file(contig_file)
     rds_list = [rds] * len(contig_list)
@@ -94,7 +94,7 @@ def main():
         for result in executor.map(run_mapping, rds_list, contig_list, rds_sample, outdir_list, contig_name_list):
             print(result, 'done')
 
-    parse_meta(args.mapping_cell_type)
+    parse_meta(args.mapping_cell_type, outdir)
 
 
 if __name__ == '__main__':
