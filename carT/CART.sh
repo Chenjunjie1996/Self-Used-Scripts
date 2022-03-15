@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/carT/carT.py /SGRNJ03/randd/RD20102301_DZH/Drug_CAR_T/20220113/singleR_annotation/ZD013_S2_1_ZL /SGRNJ03/randd/RD20102301_DZH/Drug_CAR_T/20220113_4/ZD013_S2_1_CAR_FJ/06.analysis_capture_virus/ZD013_S2_1_CAR_FJ_virus_tsne.tsv

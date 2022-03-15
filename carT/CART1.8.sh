@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/carT/carT_1.8.py /SGRNJ03/randd/RD20102301_DZH/BZ_CART/FS/celescope1.5.1/ms3/20220311_2/singleR_annotation/YSM_B3 /SGRNJ03/randd/RD20102301_DZH/BZ_CART/FS/celescope1.8.0/20220311/YSM_B3_CAR/06.filter_virus/YSM_B3_CAR_filtered_UMI.csv
