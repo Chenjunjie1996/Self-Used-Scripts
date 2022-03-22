@@ -48,7 +48,7 @@ out.df = stringr::str_glue("{argv$outdir}/{argv$sample}_metadata.tsv")
 write.table(as.data.frame(rds@meta.data), file=out.df, sep='\t')
 
 png(out.image, height=1000, width=1000)
-DimPlot(rds,reduction="tsne", group.by="celltype", cols=color1, pt.size=1.4, label=TRUE, label.size = 12)
+DimPlot(rds,reduction="tsne", group.by="celltype", cols=color1, pt.size=1.4, label=TRUE, label.size = 8)
 dev.off()
 
 
