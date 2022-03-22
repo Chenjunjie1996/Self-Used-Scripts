@@ -26,9 +26,11 @@ argv <- add_argument(argv,"--outdir", help="out dir")
 argv <- parse_args(argv)
 
 if (argv$species == "mouse") {
-    ref = MouseRNAseqData() 
+    # ref = MouseRNAseqData()
+    ref = readRDS('/SGRNJ03/randd/cjj/Script/singleR/MouseRNAseqData.rds')
 } else {
-    ref = HumanPrimaryCellAtlasData()
+    # ref = HumanPrimaryCellAtlasData()
+    ref = readRDS('/SGRNJ03/randd/cjj/Script/singleR/HumanPrimaryCellAtlasData.rds')
 }
 
 # out
