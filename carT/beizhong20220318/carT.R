@@ -64,7 +64,7 @@ dev.off()
 
 outP2 = stringr::str_glue("{args$outdir}/{args$sample}_assign.png")
 png(outP2, height=1000, width=1000)
-UMAPPlot(rds,group.by='celltype',label=TRUE,label.box=TRUE)
+UMAPPlot(rds,group.by='celltype',label=TRUE,label.size=8)
 dev.off()
 
 print(res)

@@ -22,7 +22,7 @@ if (grepl("UMI.csv", args$UMI_tsne)){
   cart$shi<-paste(args$sample,"_",sep="")
   cart$barcode<-str_c(cart$shi,cart$barcode)
   #
-  cells <- subset(cart, sd41bb_CD3zetaV2!=0)
+  cells <- subset(cart, sum_UMI!=0)
   barcodes <- unique(cells$barcode)
 }else{
   print(args$UMI_tsne)
@@ -56,18 +56,18 @@ write.table(as.data.frame(rds@meta.data), file=out.df, sep='\t')
 
 outP = stringr::str_glue("{args$outdir}/{args$sample}_cluster_umap.png")
 png(outP, height=1000, width=1000)
-UMAPPlot(rds,group.by='seurat_clusters',label=TRUE)
+UMAPPlot(rds,group.by='seurat_clusters',label=TRUE, label.size=8)
 dev.off()
 
 outP1 = stringr::str_glue("{args$outdir}/{args$sample}_umapplot.png")
 png(outP1, height=1000, width=1000)
-UMAPPlot(rds,group.by='Class',cols=c('grey','red'))
+UMAPPlot(rds,group.by='Class',cols=c('grey','red'), label.size=8)
 dev.off()
 
 outP2 = stringr::str_glue("{args$outdir}/{args$sample}_assign.png")
 png(outP2, height=1000, width=1000)
 #
-UMAPPlot(rds,group.by='celltype',label=TRUE,label.box=TRUE)
+UMAPPlot(rds,group.by='celltype',label=TRUE, label.size=8)
 dev.off()
 
 print(res)
