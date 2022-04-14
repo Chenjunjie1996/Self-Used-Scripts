@@ -16,6 +16,10 @@ ROOT_DIR = os.path.dirname(__file__)
 OUT_ROOT = "singleR_annotation"
 
 
+class NoMatrixError(Exception):
+    pass
+
+
 class singleR():
     def __init__(self, sample, outdir, matrix_file, species):
         self.sample = sample
@@ -94,9 +98,14 @@ def parse_mapfile(mapfile):
 def run_single(sample, path, species):
     outdir = f'{OUT_ROOT}/{sample}'
     utils.check_mkdir(outdir)
-    matrix_file = glob.glob(f'{path}/0*.count/{sample}_matrix_10X/')[0]
-    if not os.path.exists(matrix_file):
-        matrix_file = f'{path}/05.count/{sample}_matrix_10X/'
+    
+    try:
+      matrix_file = glob.glob(f'{path}/0*.count/{sample}_matrix_10X/')[0]
+    except IndexError:
+      matrix_file = glob.glob(f'{path}/0*.count/{sample}_filtered_feature_bc_matrix/')[0]
+    else:
+      raise NoMatrixError
+
     runner = singleR(sample, outdir, matrix_file, species)
     runner.run()
 
