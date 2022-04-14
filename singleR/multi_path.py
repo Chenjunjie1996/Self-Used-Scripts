@@ -100,11 +100,11 @@ def run_single(sample, path, species):
     utils.check_mkdir(outdir)
     
     try:
-      matrix_file = glob.glob(f'{path}/0*.count/{sample}_matrix_10X/')[0]
+        matrix_file = glob.glob(f'{path}/0*.count/{sample}_matrix_10X/')[0]
     except IndexError:
-      matrix_file = glob.glob(f'{path}/0*.count/{sample}_filtered_feature_bc_matrix/')[0]
+        matrix_file = glob.glob(f'{path}/0*.count/{sample}_filtered_feature_bc_matrix/')[0]
     else:
-      raise NoMatrixError
+        raise NoMatrixError
 
     runner = singleR(sample, outdir, matrix_file, species)
     runner.run()
