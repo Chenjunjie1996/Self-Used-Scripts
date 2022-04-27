@@ -103,7 +103,7 @@ def run_single(sample, path, species):
         matrix_file = glob.glob(f'{path}/0*.count/{sample}_matrix_10X/')[0]
     except IndexError:
         matrix_file = glob.glob(f'{path}/0*.count/{sample}_filtered_feature_bc_matrix/')[0]
-    else:
+    if not os.path.exists(matrix_file):
         raise NoMatrixError
 
     runner = singleR(sample, outdir, matrix_file, species)
