@@ -1,5 +1,0 @@
-Fraction of cells have mito gene percent>5%:97.9%
-Fraction of cells have mito gene percent>10%:78.78%
-Fraction of cells have mito gene percent>15%:39.85%
-Fraction of cells have mito gene percent>20%:18.76%
-Fraction of cells have mito gene percent>50%:0.15%
