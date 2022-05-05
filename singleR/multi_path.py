@@ -21,15 +21,18 @@ class NoMatrixError(Exception):
 
 
 class singleR():
-    def __init__(self, sample, outdir, matrix_file, species):
+    def __init__(self, sample, outdir, matrix_file, species, path):
         self.sample = sample
         self.outdir = outdir
         self.matrix_file = matrix_file
         self.species = species
+        self.path = path
         self.meta = f'{self.outdir}/{self.sample}_metadata.tsv'
+        self.rds = f'{self.path}/06.analysis/{self.sample}.rds'
 
         # out
-        self.rds = f'{self.outdir}/{self.sample}.rds'
+        if not os.path.exists(self.rds):
+            self.rds = f'{self.outdir}/{self.sample}.rds'
 
 
     @utils.add_log
@@ -83,7 +86,8 @@ class singleR():
         report.save(f'{self.outdir}/{self.sample}_count.xls')
 
     def run(self):
-        self.run_seurat()
+        if not os.path.exists(self.rds):
+            self.run_seurat()
         self.run_singleR()
         self.run_count()
 
@@ -106,7 +110,7 @@ def run_single(sample, path, species):
     if not os.path.exists(matrix_file):
         raise NoMatrixError
 
-    runner = singleR(sample, outdir, matrix_file, species)
+    runner = singleR(sample, outdir, matrix_file, species, path)
     runner.run()
 
 
