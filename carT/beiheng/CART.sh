@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/celedev/beiheng/beihengCART.py ZD020C2_S2_1_ZL /SGRNJ06/randd/USER/cjj/celedev/beiheng/20220509/BH.rds /SGRNJ03/randd/RD20102301_DZH/Drug_CAR_T/20220505_4/ZD020C2_S2_1_CAR/06.analysis_capture_virus/ZD020C2_S2_1_CAR_otsu_UMI_count.tsv
