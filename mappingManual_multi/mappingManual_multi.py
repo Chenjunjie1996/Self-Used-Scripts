@@ -32,6 +32,9 @@ def parse_file(contig_file):
         elif os.path.exists(f'{contig}/04.summarize'):
             contig_file = glob.glob(f'{contig}/04.summarize/*_filtered_contig.csv')[0]
             contig_list.append(contig_file)
+        elif os.path.exists(f'{contig}/03.summarize'):
+            contig_file = glob.glob(f'{contig}/03.summarize/*_filtered_contig.csv')[0]
+            contig_list.append(contig_file)
         else:
             print("check contig file path")
             raise FileNotFoundError
