@@ -35,6 +35,7 @@ if (argv$species == "mouse") {
 
 # out
 out.image = stringr::str_glue("{argv$outdir}/{argv$sample}_cell_type.png")
+out.rds = stringr::str_glue("{argv$outdir}/{argv$sample}.rds")
 
 rds = readRDS(argv$rds)
 
@@ -50,5 +51,7 @@ write.table(as.data.frame(rds@meta.data), file=out.df, sep='\t')
 png(out.image, height=1000, width=1000)
 DimPlot(rds,reduction="tsne", group.by="celltype", cols=color1, pt.size=1.4, label=TRUE, label.size = 8)
 dev.off()
+
+saveRDS(rds, out.rds)
 
 
