@@ -54,8 +54,17 @@ def get_anno_seq(cr_out):
         outfile.write('|'.join(list(df_tmp.c_call)))
         outfile.write('\n')
         for i in range(df_tmp.shape[0]):
-            outfile.write(f'ChianType:{list(df_tmp.chain)[i]}\n{list(df_tmp.sequence)[i]}\n')
-    outfile.close()
+            seq_nt = list(df_tmp.sequence)[i]
+            seq_aa = list(df_tmp.sequence_aa)[i]
+            for j in range(len(seq_nt)):
+                if str(Seq(seq_nt[j:]).translate()) == seq_aa:
+                    seq_nt_write = seq_nt[j:]
+                    if len(seq_nt_write) % 3 == 1:
+                        seq_nt_write = seq_nt[j:-1]
+                    elif len(seq_nt_write) % 3 == 2:
+                        seq_nt_write = seq_nt[j:-2]
+                    outfile.write(f'ChianType:{list(df_tmp.chain)[i]}\n{seq_nt_write}\n')
+                    break
 
 
     df_h = contig_for_plot[contig_for_plot['chain']=='IGH']
