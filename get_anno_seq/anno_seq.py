@@ -4,6 +4,7 @@ import sys
 import copy
 import glob
 import matplotlib.pyplot as plt
+from Bio.Seq import Seq
 
 
 def get_anno_seq(cr_out):
