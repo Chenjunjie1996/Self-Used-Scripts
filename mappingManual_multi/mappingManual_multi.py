@@ -9,7 +9,7 @@ import xlwt
 import os
 
 
-def run_mapping(rds, contig, sample, outidr, contig_name):
+def run_mapping(rds, contig, sample, outdir, contig_name):
     cmd = (
         f'Rscript /SGRNJ03/randd/cjj/Script/mappingManual_multi/mappingManual_multi.R '
         f'--rds {rds} '
@@ -18,6 +18,7 @@ def run_mapping(rds, contig, sample, outidr, contig_name):
         f'--outdir {outdir} '
         f'--contig_name {contig_name} '
     )
+    subprocess.check_call(cmd, shell=True)
 
 
 def parse_file(contig_file):
@@ -36,6 +37,7 @@ def parse_file(contig_file):
             contig_list.append(contig_file)
         elif os.path.exists(f'{contig}/05.count_vdj'):
             contig_file = glob.glob(f'{contig}/05.count_vdj/*_cell_confident_count.tsv')[0]
+            contig_list.append(contig_file)
         else:
             print("check contig file path")
             raise FileNotFoundError

@@ -20,7 +20,7 @@ rds <- readRDS(args$rds)
 
 Idents(rds) <- "orig.ident"
 rna <- subset(rds,idents = c(args$sample))
- 
+
 if (grepl("confident_count.tsv", args$vdj)){
   vdj <- read.table(args$VDJ, sep='\t', header=T)
   vdj$shi<-paste(args$sample,"_",sep="")
