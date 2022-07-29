@@ -21,11 +21,18 @@ rds <- readRDS(args$rds)
 Idents(rds) <- "orig.ident"
 rna <- subset(rds,idents = c(args$sample))
  
-vdj <- read.table(args$VDJ, sep=',', header=T)
-vdj$shi<-paste(args$sample,"_",sep="")
-vdj$barcode<-str_c(vdj$shi,vdj$barcode)
+if (grepl("confident_count.tsv", args$vdj)){
+  vdj <- read.table(args$VDJ, sep='\t', header=T)
+  vdj$shi<-paste(args$sample,"_",sep="")
+  vdj$barcode<-str_c(vdj$shi,vdj$barcode)
+  cells <- vdj
+}else{
+  vdj <- read.table(args$VDJ, sep=',', header=T)
+  vdj$shi<-paste(args$sample,"_",sep="")
+  vdj$barcode<-str_c(vdj$shi,vdj$barcode)
+  cells <- subset(vdj, productive=='True')
+}
 
-cells <- subset(vdj, productive=='True')
 barcodes <- unique(cells$barcode)
 
 df <- rna@meta.data
@@ -62,4 +69,3 @@ dev.off()
 meta = rna@meta.data
 outMeta = stringr::str_glue("{args$outdir}/{args$contig_name}_meta.csv")
 write.csv(meta,outMeta)
-

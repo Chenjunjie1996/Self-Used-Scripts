@@ -8,7 +8,8 @@ from concurrent.futures import ProcessPoolExecutor
 import xlwt
 import os
 
-def run_mapping(rds, contig, sample, outdir, contig_name):
+
+def run_mapping(rds, contig, sample, outidr, contig_name):
     cmd = (
         f'Rscript /SGRNJ03/randd/cjj/Script/mappingManual_multi/mappingManual_multi.R '
         f'--rds {rds} '
@@ -17,11 +18,9 @@ def run_mapping(rds, contig, sample, outdir, contig_name):
         f'--outdir {outdir} '
         f'--contig_name {contig_name} '
     )
-    subprocess.check_call(cmd, shell=True)
 
 
 def parse_file(contig_file):
-
     contigs = contig_file.strip().split(",")
     contig_name_list = [os.path.abspath(i).split('/')[-1] for i in contigs]
     contig_list = []
@@ -35,11 +34,14 @@ def parse_file(contig_file):
         elif os.path.exists(f'{contig}/03.summarize'):
             contig_file = glob.glob(f'{contig}/03.summarize/*_filtered_contig.csv')[0]
             contig_list.append(contig_file)
+        elif os.path.exists(f'{contig}/05.count_vdj'):
+            contig_file = glob.glob(f'{contig}/05.count_vdj/*_cell_confident_count.tsv')[0]
         else:
             print("check contig file path")
             raise FileNotFoundError
 
     return contig_list, contig_name_list
+
 
 def parse_meta(mapping_cell_type, outdir):
     meta_list = glob.glob(f"./{outdir}/*_meta.csv")
@@ -76,6 +78,7 @@ def parse_meta(mapping_cell_type, outdir):
     report.save(f'./{outdir}/mapping_count.xls')
     return report
 
+
 def main():
     parser = argparse.ArgumentParser(description='contigfile')
     parser.add_argument('--contig_file', help='contig file', required=True)
@@ -102,4 +105,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
