@@ -6,10 +6,10 @@ import glob
 import matplotlib.pyplot as plt
 from Bio.Seq import Seq
 
-¡±¡°¡±
+"""
 columns
 Clonotype(clonotype_id|V-gene|D-gene|J-gene|CDR3|C-gene|)       Cell_Number     Cgene   Sequence
-¡°¡±¡°
+"""
 def get_anno_seq(cr_out):
     airr = pd.read_csv(f'{cr_out}/airr_rearrangement.tsv',sep='\t')
     contig = pd.read_csv(f'{cr_out}/filtered_contig_annotations.csv')
