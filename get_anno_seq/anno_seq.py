@@ -14,7 +14,7 @@ def get_anno_seq(cr_out):
     
     contig = contig[contig['productive']==True]
     contig_for_plot = copy.deepcopy(contig)
-    contig = contig[['contig_id','raw_clonotype_id','cdr3']]
+    contig = contig[['contig_id','raw_clonotype_id','cdr3','reads']]
     contig.rename(columns={'contig_id':'sequence_id'},inplace=True)
     df_merge = pd.merge(airr,contig,on='sequence_id',how='inner')
     del df_merge['clone_id']
@@ -23,7 +23,7 @@ def get_anno_seq(cr_out):
     df_merge_f = pd.merge(df_merge,clonotype,on='clonotype_id')
     df_merge_f['chain'] = df_merge_f['v_call'].apply(lambda x:x[:3])
     df_merge_f['id_num'] = df_merge_f['clonotype_id'].apply(lambda x: int(x[9:]))
-    df_merge_f.sort_values(['id_num','chain'],inplace=True)
+    df_merge_f.sort_values(['id_num','chain','reads'],ascending=[True,True,False],inplace=True)
     
     df_merge_f.drop_duplicates(['clonotype_id','chain'],inplace=True)
     df_merge_f = df_merge_f.where(df_merge_f.notnull(),'None')
@@ -93,7 +93,7 @@ def get_anno_seq(cr_out):
         label.append(tmp_dict[len(tmp_dict)//2][0])
         value.append(tmp_dict[len(tmp_dict)//2][1])
     
-    plt.pie(value, labels=label,autopct='%.2f%%',pctdistance=0.8,explode=(0.1,0.1,0.1,0.1))
+    plt.pie(value, labels=label,autopct='%.2f%%',pctdistance=0.8,explode=[0.1]*len(label))
     plt.title('IG types')
     plt.savefig('./IGH.png', dpi=280)
 
