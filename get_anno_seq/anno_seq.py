@@ -8,9 +8,9 @@ from Bio.Seq import Seq
 
 
 def get_anno_seq(cr_out):
-    airr = pd.read_csv(glob.glob(f'{cr_out}/03.assemble/*/outs/airr_rearrangement.tsv')[0],sep='\t')
-    contig = pd.read_csv(glob.glob(f'{cr_out}/03.assemble/*/outs/filtered_contig_annotations.csv')[0])
-    clonotype = pd.read_csv(glob.glob(f'{cr_out}/03.assemble/*/outs/clonotypes.csv')[0])
+    airr = pd.read_csv(f'{cr_out}/airr_rearrangement.tsv',sep='\t')
+    contig = pd.read_csv(f'{cr_out}/filtered_contig_annotations.csv')
+    clonotype = pd.read_csv(f'{cr_out}/clonotypes.csv')
     
     contig = contig[contig['productive']==True]
     contig_for_plot = copy.deepcopy(contig)
