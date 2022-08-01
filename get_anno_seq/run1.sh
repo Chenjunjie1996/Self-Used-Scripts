@@ -1,0 +1,1 @@
+python /SGRNJ03/randd/cjj/Script/get_anno_seq/anno_seq1.py /SGRNJ06/bioinfo/PROJ04/PROJ_22.10X/P22062202_VDJ/20220712/WCM-20220617-B_BCR/WCM-20220617-B_VDJ_10X/outs
