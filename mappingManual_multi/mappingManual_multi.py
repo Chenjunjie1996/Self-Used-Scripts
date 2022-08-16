@@ -26,8 +26,11 @@ def parse_file(contig_file):
     contig_name_list = [os.path.abspath(i).split('/')[-1] for i in contigs]
     contig_list = []
     for contig in contigs:
-        if os.path.exists(f'{contig}/05.match/match_contigs.csv'):
-            contig_file = glob.glob(f'{contig}/05.match/match_contigs.csv')[0]
+        if os.path.exists(f'{contig}/05.match'):
+            try:
+                contig_file = glob.glob(f'{contig}/05.match/match_contigs.csv')[0]
+            except:
+                contig_file = glob.glob(f'{contig}/05.match/matched_contig_annotations.csv')[0] # 7.0
             contig_list.append(contig_file)
         elif os.path.exists(f'{contig}/04.summarize'):
             contig_file = glob.glob(f'{contig}/04.summarize/*_filtered_contig.csv')[0]
