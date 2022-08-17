@@ -84,7 +84,7 @@ def get_seqtype(path_list):
 
 
 def run_count(celltype):
-    meta_list = glob.glob(f"./{OUT_PATH}/*/meta.csv")
+    meta_list = glob.glob(f"./{OUT_PATH}/*_{celltype}/meta.csv")
     sample_list = [meta.split('/')[-2] for meta in meta_list]
     mapping_cell_type = CELL_TYPE_DICT[celltype]
 
