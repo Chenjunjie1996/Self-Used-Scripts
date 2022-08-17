@@ -127,7 +127,7 @@ def main():
     celltype = get_seqtype(path_list)
 
     with ProcessPoolExecutor(max_workers=10) as executor:
-        for result in executor.map(mapping, path_list, rds_list, sample_list):
+        for result in executor.map(mapping, path_list, rds_list, sample_list, [celltype]*len(path_list)):
             print(result, 'done')
     
     mapping_cell_type = CELL_TYPE_DICT[celltype]
