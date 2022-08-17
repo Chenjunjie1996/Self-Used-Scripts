@@ -59,9 +59,14 @@ png(outP1, height=1000, width=1000)
 UMAPPlot(rna,group.by='Class',cols=c('grey','red'),label=TRUE)
 dev.off()
 
+if ('new_ident' %in% colnames(meta)){
+  new_ident = 'new_ident'
+}else{
+  new_dent = 'celltype'
+}
 outP2 = stringr::str_glue("{args$outdir}/assign.png")
 png(outP2, height=1000, width=1000)
-UMAPPlot(rna,group.by='new_ident',label=TRUE,label.box=TRUE)
+UMAPPlot(rna,group.by=new_ident,label=TRUE,label.box=TRUE)
 dev.off()
 
 meta = rna@meta.data

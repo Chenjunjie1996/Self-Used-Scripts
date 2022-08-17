@@ -64,7 +64,7 @@ def mapping(path, rds, sample):
     elif os.path.exists(f'{path}/04.summarize'): # trust4
         VDJ_file = glob.glob(f'{path}/04.summarize/*_filtered_contig.csv')[0]
     
-    elif os.path.exists(f'{path}/05.count_vdj'):
+    elif os.path.exists(f'{path}/05.count_vdj'): # vdj-cdr3
         VDJ_file = glob.glob(f'{path}/05.count_vdj/*_cell_confident_count.tsv')[0]
 
     runner = Yinshe(sample, rds, VDJ_file, outdir)
