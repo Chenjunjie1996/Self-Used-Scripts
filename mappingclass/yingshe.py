@@ -83,9 +83,10 @@ def get_seqtype(path_list):
             return 'TCR'
 
 
-def run_count(mapping_cell_type):
+def run_count(celltype):
     meta_list = glob.glob(f"./{OUT_PATH}/*/meta.csv")
     sample_list = [meta.split('/')[-2] for meta in meta_list]
+    mapping_cell_type = CELL_TYPE_DICT[celltype]
 
     report = xlwt.Workbook()
     sheet = report.add_sheet('mapping count')
@@ -119,7 +120,7 @@ def run_count(mapping_cell_type):
         sheet.write(_i+1, 2, ZL_count[_i])
         sheet.write(_i+1, 3, percent[_i])
 
-    report.save(f'./{OUT_PATH}/mapping_count.xls')
+    report.save(f'./{OUT_PATH}/mapping_count_{celltype}.xls')
     return report
 
 
@@ -133,8 +134,7 @@ def main():
         for result in executor.map(mapping, path_list, rds_list, sample_list, [celltype]*len(path_list)):
             print(result, 'done')
     
-    mapping_cell_type = CELL_TYPE_DICT[celltype]
-    run_count(mapping_cell_type)
+    run_count(celltype)
 
 
 if __name__ == '__main__':
