@@ -67,8 +67,11 @@ def mapping(path, rds, sample, celltype):
     elif os.path.exists(f'{path}/05.count_vdj'): # vdj-cdr3
         VDJ_file = glob.glob(f'{path}/05.count_vdj/*_cell_confident_count.tsv')[0]
 
-    runner = Yinshe(sample, rds, VDJ_file, outdir)
-    runner.run()
+    if os.path.exists(VDJ_file):
+        runner = Yinshe(sample, rds, VDJ_file, outdir)
+        runner.run()
+    else:
+        raise FileNotFoundError('please check vdj file')
 
 
 def get_seqtype(path_list):
