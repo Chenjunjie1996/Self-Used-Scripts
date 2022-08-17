@@ -62,7 +62,7 @@ dev.off()
 if ('new_ident' %in% colnames(meta)){
   new_ident = 'new_ident'
 }else{
-  new_dent = 'celltype'
+  new_ident = 'celltype'
 }
 outP2 = stringr::str_glue("{args$outdir}/assign.png")
 png(outP2, height=1000, width=1000)
