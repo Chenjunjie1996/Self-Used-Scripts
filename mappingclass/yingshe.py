@@ -51,8 +51,8 @@ def parse_mapfile(mapfile):
     return path_list, rds_list, sample_list
 
 
-def mapping(path, rds, sample):
-    outdir = f'{OUT_PATH}/{sample}'
+def mapping(path, rds, sample, celltype):
+    outdir = f'{OUT_PATH}/{sample}_{celltype}'
     utils.check_mkdir(outdir)
     
     if os.path.exists(f'{path}/05.match'): # cellranger
@@ -72,7 +72,7 @@ def mapping(path, rds, sample):
 
 
 def get_seqtype(path_list):
-    run_shell = glob.glob(f'{path_list[0]}/*.mapfile')
+    run_shell = glob.glob(f'{path_list[0]}/../*.mapfile')[0]
     with open(run_shell) as f:
         for line in f.readlines():
             if 'BCR' in line:
@@ -124,12 +124,13 @@ def main():
     os.system(f'mkdir {OUT_PATH}')
     mapfile = sys.argv[1]
     path_list, rds_list, sample_list = parse_mapfile(mapfile)
+    celltype = get_seqtype(path_list)
 
     with ProcessPoolExecutor(max_workers=10) as executor:
         for result in executor.map(mapping, path_list, rds_list, sample_list):
             print(result, 'done')
     
-    mapping_cell_type = CELL_TYPE_DICT[get_seqtype(path_list)]
+    mapping_cell_type = CELL_TYPE_DICT[celltype]
     run_count(mapping_cell_type)
 
 
