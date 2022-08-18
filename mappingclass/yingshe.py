@@ -75,7 +75,7 @@ def mapping(path, rds, sample, celltype):
 
 
 def get_seqtype(path_list):
-    run_shell = glob.glob(f'{path_list[0]}/../*.mapfile')[0]
+    run_shell = glob.glob(f'{path_list[0]}/../*.sh')[0]
     with open(run_shell) as f:
         for line in f.readlines():
             if 'BCR' in line:
