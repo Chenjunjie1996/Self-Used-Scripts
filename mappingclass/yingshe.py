@@ -76,10 +76,9 @@ def mapping(path, rds, sample, celltype):
 
 def get_seqtype(path_list):
     run_shell = glob.glob(f'{path_list[0]}/../*.sh')[0]
-    print(run_shell)
+
     with open(run_shell) as f:
         for line in f.readlines():
-            print(line)
             if 'BCR' in line:
                 return 'BCR'
             elif 'TCR' in line:
@@ -111,7 +110,7 @@ def run_count(celltype):
         df_count = df[df[ident].isin(mapping_cell_type)]
 
         mapping_count.append(int(df_count['Class'].value_counts()))
-        ZL_count.append(int(df_count[ident].value_counts()))
+        ZL_count.append(int(df_count.shape[0]))
 
     percent = [x / y for x, y in zip(mapping_count, ZL_count)]
     percent = [str(round(i,4)*100) + "%" for i in percent]
