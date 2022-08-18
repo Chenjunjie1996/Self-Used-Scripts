@@ -76,11 +76,15 @@ def mapping(path, rds, sample, celltype):
 
 def get_seqtype(path_list):
     run_shell = glob.glob(f'{path_list[0]}/../*.sh')[0]
+    print(run_shell)
     with open(run_shell) as f:
         for line in f.readlines():
+            print(line)
             if 'BCR' in line:
                 return 'BCR'
-            return 'TCR'
+            elif 'TCR' in line:
+		            return 'TCR'
+        raise ValueError('seqtype not found')
 
 
 def run_count(celltype):
@@ -129,7 +133,7 @@ def main():
     mapfile = sys.argv[1]
     path_list, rds_list, sample_list = parse_mapfile(mapfile)
     celltype = get_seqtype(path_list)
-
+    print(celltype)
     with ProcessPoolExecutor(max_workers=10) as executor:
         for result in executor.map(mapping, path_list, rds_list, sample_list, [celltype]*len(path_list)):
             print(result, 'done')
