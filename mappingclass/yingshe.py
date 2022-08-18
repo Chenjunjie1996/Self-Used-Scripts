@@ -82,7 +82,7 @@ def get_seqtype(path_list):
             if 'BCR' in line:
                 return 'BCR'
             elif 'TCR' in line:
-		            return 'TCR'
+                return 'TCR'
         raise ValueError('seqtype not found')
 
 
