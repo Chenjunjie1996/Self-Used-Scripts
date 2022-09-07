@@ -83,8 +83,6 @@ def get_seqtype(path_list):
                 return 'BCR'
             elif 'TCR' in line:
                 return 'TCR'
-            else:
-                raise ValueError('seqtype not found')
 
 
 def run_count(celltype):
