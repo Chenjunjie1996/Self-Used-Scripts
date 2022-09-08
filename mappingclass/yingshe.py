@@ -47,12 +47,13 @@ def parse_mapfile(mapfile):
     path_list = df_mapfile['path']
     rds_list = df_mapfile['rds']
     sample_list = df_mapfile['sample']
+    contig_name_list = [os.path.abspath(i).split('/')[-1] for i in path_list]
 
-    return path_list, rds_list, sample_list
+    return path_list, rds_list, sample_list, contig_name_list
 
 
-def mapping(path, rds, sample, celltype):
-    outdir = f'{OUT_PATH}/{sample}_{celltype}'
+def mapping(path, rds, sample, contig_name, celltype):
+    outdir = f'{OUT_PATH}/{contig_name}_{celltype}'
     utils.check_mkdir(outdir)
     
     if os.path.exists(f'{path}/05.match'): # cellranger
@@ -105,7 +106,7 @@ def run_count(celltype):
         elif 'celltype' in df.columns: # singleR column name
             ident = 'celltype'
 
-        df[ident] = df[ident].apply(lambda x: re.sub(r"[^a-zA-Z0-9]","", x).upper())
+        df[ident] = df[ident].apply(lambda x: re.sub(r"[^a-zA-Z0-9]","", str(x)).upper())
         df_count = df[df[ident].isin(mapping_cell_type)]
 
         mapping_count.append(int(df_count['Class'].value_counts()))
@@ -129,11 +130,11 @@ def run_count(celltype):
 def main():
     os.system(f'mkdir {OUT_PATH}')
     mapfile = sys.argv[1]
-    path_list, rds_list, sample_list = parse_mapfile(mapfile)
+    path_list, rds_list, sample_list, contig_name_list = parse_mapfile(mapfile)
     celltype = get_seqtype(path_list)
     print(celltype)
     with ProcessPoolExecutor(max_workers=10) as executor:
-        for result in executor.map(mapping, path_list, rds_list, sample_list, [celltype]*len(path_list)):
+        for result in executor.map(mapping, path_list, rds_list, sample_list, contig_name_list, [celltype]*len(path_list)):
             print(result, 'done')
     
     run_count(celltype)
