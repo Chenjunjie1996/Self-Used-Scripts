@@ -108,9 +108,14 @@ def run_count(celltype):
 
         df[ident] = df[ident].apply(lambda x: re.sub(r"[^a-zA-Z0-9]","", str(x)).upper())
         df_count = df[df[ident].isin(mapping_cell_type)]
-
-        mapping_count.append(int(df_count['Class'].value_counts()))
+        
+        try:
+            mapping_count.append(int(df_count['Class'].value_counts()))
+        except TypeError:
+            mapping_count.append(0)
+        
         ZL_count.append(int(df_count.shape[0]))
+        ZL_count = [float('-inf') if i==0 else i for i in ZL_count]
 
     percent = [x / y for x, y in zip(mapping_count, ZL_count)]
     percent = [str(round(i,4)*100) + "%" for i in percent]
