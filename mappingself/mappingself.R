@@ -14,11 +14,12 @@ args <- parser$parse_args()
 
 
 rds <- readRDS(args$rds)
-meta = rds@meta.data
 vdj <- read.table(args$VDJ, sep=',', header=T)
 
-vdj$shi<-paste(args$sample,"_",sep="")
-vdj$barcode<-str_c(vdj$shi,vdj$barcode)
+if (grepl("_", rownames(df)[1])){
+  vdj$shi<-paste(args$sample,"_",sep="")
+  vdj$barcode<-str_c(vdj$shi,vdj$barcode)
+}
 
 cells <- subset(vdj, productive=='True')
 barcodes <- unique(cells$barcode)
@@ -51,8 +52,16 @@ dev.off()
 
 outP2 = stringr::str_glue("{args$outdir}/{args$sample}_assign.png")
 png(outP2, height=1000, width=1000)
-UMAPPlot(rds,group.by='celltype',label=TRUE,label.box=TRUE)
+if ('new_ident' %in% colnames(meta)){
+  UMAPPlot(rds,group.by='new_ident',label=TRUE,label.box=TRUE)
+}else{
+  UMAPPlot(rds,group.by='celltype',label=TRUE,label.box=TRUE)
+}
 dev.off()
+
+meta = rds@meta.data
+outMeta = stringr::str_glue("{args$outdir}/{args$sample}_meta.csv")
+write.csv(meta,outMeta)
 
 print(res)
 print(table(meta$celltype))
