@@ -15,7 +15,7 @@ def parse_meta():
     mapping_count, ZL_count = [], []
     for meta in meta_list:
         df = pd.read_csv(meta)
-        
+        df['CellTypes'].apply(lambda x: re.sub(r"[^a-zA-Z0-9]","", str(x)).upper())
         df_count = df[df['CellTypes'].isin(Celltype)]
         _i,_j = df_count[df_count['Class']=='T/BCR'].shape[0], df_count['CellTypes'].shape[0]
         mapping_count.append(int(_i))
@@ -37,7 +37,7 @@ def parse_meta():
 if __name__ == '__main__':
     mapping_type = sys.argv[1]
     if mapping_type == "T":
-        Celltype = {'T_cells','NKT_cells','T cells','NK T cells','Tcells'}
+        Celltype = {'TCELLS', 'TCELL' 'NKTCELLS'}
     elif mapping_type == "B":
-        Celltype = {'Plasma_cells','B_cells','Mature_B_cell', 'Plasma cells', 'B cells','Bcells'}
+        Celltype = {'MATUREBCELL', 'PLASMACELLS', 'BCELLS', 'BCELL', 'PREBCELLCD34'}
     parse_meta()
