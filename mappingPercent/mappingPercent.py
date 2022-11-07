@@ -4,7 +4,7 @@ import glob
 import xlwt
 
 def parse_meta():
-    meta_list = glob.glob("./mapping_res/*_meta.csv")
+    meta_list = glob.glob("./*_meta.csv")
     sample_list = ['_'.join(i.split('/')[-1].split('_')[:-1]) for i in meta_list]
 
     report = xlwt.Workbook()
@@ -31,7 +31,7 @@ def parse_meta():
         sheet.write(_i+1, 2, ZL_count[_i])
         sheet.write(_i+1, 3, percent[_i])
 
-    report.save('./mapping_res/mapping_count.xls')
+    report.save('./mapping_count.xls')
     return report
 
 if __name__ == '__main__':
