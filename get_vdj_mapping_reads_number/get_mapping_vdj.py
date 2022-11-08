@@ -71,9 +71,9 @@ class Mapping_vdj:
         self.result_list = result
     
     def __call__(self):
-#        with ProcessPoolExecutor(max_workers=4) as executor:
-#            for result in executor.map(self.get_mapping_reads, OUT_NAME[self.seqtype]):
-#                self.result_list.append(result)
+        with ProcessPoolExecutor(max_workers=4) as executor:
+            for result in executor.map(self.get_mapping_reads, OUT_NAME[self.seqtype]):
+                self.result_list.append(result)
         
         self.write_metrics()
 
