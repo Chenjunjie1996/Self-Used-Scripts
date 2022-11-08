@@ -2,6 +2,7 @@ import pandas as pd
 import sys
 import glob
 import xlwt
+import re
 
 def parse_meta():
     meta_list = glob.glob("./*_meta.csv")
@@ -15,9 +16,9 @@ def parse_meta():
     mapping_count, ZL_count = [], []
     for meta in meta_list:
         df = pd.read_csv(meta)
-        df['CellTypes'].apply(lambda x: re.sub(r"[^a-zA-Z0-9]","", str(x)).upper())
-        df_count = df[df['CellTypes'].isin(Celltype)]
-        _i,_j = df_count[df_count['Class']=='T/BCR'].shape[0], df_count['CellTypes'].shape[0]
+        df['cluster'] = df['cluster'].apply(lambda x: re.sub(r"[^a-zA-Z0-9]","", str(x)).upper())
+        df_count = df[df['cluster'].isin(Celltype)]
+        _i,_j = df_count[df_count['Class']=='T/BCR'].shape[0], df_count.shape[0]
         mapping_count.append(int(_i))
         ZL_count.append(int(_j))
     percent = [x / y for x, y in zip(mapping_count, ZL_count)]
