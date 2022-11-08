@@ -4,6 +4,8 @@ from celescope.tools import utils
 from concurrent.futures import ProcessPoolExecutor
 import subprocess
 import argparse
+import pysam
+import json
 
 
 TOOLS_DIR = os.path.dirname(celescope.tools.__file__) + '/trust4'
@@ -24,6 +26,22 @@ parser.add_argument("--seqtype", help="TCR or BCR", choices=["TCR", "BCR"], requ
 args = parser.parse_args()
 
 
+def get_fastx_read_number(fastx_file):
+    """
+    get read number using pysam
+    """
+    n = 0
+    with pysam.FastxFile(fastx_file) as f:
+        for _ in f:
+            n += 1
+    return n
+    
+
+def dump_dict_to_json(d, json_file):
+    with open(json_file, 'w') as f:
+        json.dump(d, f, indent=4)
+        
+        
 class Mapping_vdj:
     """
     ##Features
@@ -53,9 +71,9 @@ class Mapping_vdj:
         self.result_list = result
     
     def __call__(self):
-        with ProcessPoolExecutor(max_workers=4) as executor:
-            for result in executor.map(self.get_mapping_reads, OUT_NAME[self.seqtype]):
-                self.result_list.append(result)
+#        with ProcessPoolExecutor(max_workers=4) as executor:
+#            for result in executor.map(self.get_mapping_reads, OUT_NAME[self.seqtype]):
+#                self.result_list.append(result)
         
         self.write_metrics()
 
@@ -75,7 +93,7 @@ class Mapping_vdj:
     def write_metrics(self):
         metrics = []
         with ProcessPoolExecutor(max_workers=4) as executor:
-            for result in executor.map(utils.get_fastx_read_number, [self.fq1] + [i + "_1.fq" for i in OUT_NAME[self.seqtype]]):
+            for result in executor.map(get_fastx_read_number, [self.fq1] + [i + "_1.fq" for i in OUT_NAME[self.seqtype]]):
                 metrics.append(result)
         
         if self.seqtype == "TCR":
@@ -83,7 +101,7 @@ class Mapping_vdj:
         else:
             metrics = dict(zip(["Total Reads" ,"Reads Mapped To Any V(D)J Genes", "Reads Mapped To IGH", "Reads Mapped To IGK", "Reads Mapped To IGL"], metrics))
 
-        utils.dump_dict_to_json(metrics, "./Mapping_VDJ.json")
+        dump_dict_to_json(metrics, "./Mapping_VDJ.json")
     
     
 if __name__ == '__main__':
