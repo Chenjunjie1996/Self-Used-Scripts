@@ -105,6 +105,8 @@ def run_count(celltype):
             ident = 'new_ident'
         elif 'celltype' in df.columns: # singleR column name
             ident = 'celltype'
+        else:
+            ident = 'cluster'
 
         df[ident] = df[ident].apply(lambda x: re.sub(r"[^a-zA-Z0-9]","", str(x)).upper())
         df_count = df[df[ident].isin(mapping_cell_type)]

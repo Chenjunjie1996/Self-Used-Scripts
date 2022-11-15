@@ -14,7 +14,8 @@ args <- parser$parse_args()
 
 rds <- readRDS(args$rds)
 
-Idents(rds) <- "orig.ident"
+#Idents(rds) <- "orig.ident"
+Idents(rds) <- "sample"
 rna <- subset(rds,idents = c(args$sample))
 
 if (grepl("confident_count.tsv", args$VDJ)){
@@ -31,7 +32,7 @@ if (grepl("_", rownames(df)[1])){
   vdj$barcode<-str_c(vdj$shi,vdj$barcode)
 }
 
-cells <- vdj
+cells <- subset(vdj, productive=='True')
 barcodes <- unique(cells$barcode)
 
 filter_df <- filter(df, barcode %in% barcodes)
@@ -41,9 +42,21 @@ res <- as.data.frame(res)
 out_csv = stringr::str_glue("{args$outdir}/match_barcodes_celltypes_distribution.txt")
 write_csv(res,file=out_csv)
 
+#meta = rna@meta.data
+#meta$Class = 'NA'
+#meta[barcodes,'Class'] = 'T/BCR'
+#meta <- meta %>% drop_na(nCount_RNA)
+#table(meta$Class == 'T/BCR')
+#rna@meta.data = meta
+#rna <- RunUMAP(rna, dims = 1:20)
 meta = rna@meta.data
 meta$Class = 'NA'
-meta[barcodes,'Class'] = 'T/BCR'
+meta$barcode = rownames(meta)
+meta = meta %>%
+  mutate(Class = if_else(barcode %in% barcodes,
+                         true = "T/BCR",
+                         false = "NA"))
+meta = dplyr::select(meta, -c("barcode"))
 meta <- meta %>% drop_na(nCount_RNA)
 table(meta$Class == 'T/BCR')
 rna@meta.data = meta
@@ -63,8 +76,10 @@ outP2 = stringr::str_glue("{args$outdir}/assign.png")
 png(outP2, height=1000, width=1000)
 if ('new_ident' %in% colnames(meta)){
   UMAPPlot(rna,group.by='new_ident',label=TRUE,label.box=TRUE)
-}else{
+}else if {
   UMAPPlot(rna,group.by='celltype',label=TRUE,label.box=TRUE)
+} else {
+  UMAPPlot(rds,group.by='cluster',label=TRUE,label.box=TRUE)
 }
 dev.off()
 
