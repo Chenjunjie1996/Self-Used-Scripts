@@ -24,15 +24,15 @@ def run_count(outdir, sample):
     sheet = report.add_sheet('CART-Count')
     row0 = [f"{sample}_celltype", "Cluster", "CellNumber", "Cell With CAR"]
 
-    cell_type_list = list(df_meta['celltype'].unique()) #
+    cell_type_list = list(df_meta['cluster'].unique()) #
     cluster_list, cell_number_list, car_cell_number_list = [], [], []
 
     for i in cell_type_list:
-        cluster = sorted(df_meta[df_meta['celltype'] == f'{i}'].seurat_clusters.unique().tolist()) #
+        cluster = sorted(df_meta[df_meta['cluster'] == f'{i}'].seurat_cluster.unique().tolist()) #
         cluster_list.append(",".join([str(int(x)) for x in cluster]))
-        cell_number = df_meta[df_meta['celltype'] == f'{i}'].shape[0] # 
+        cell_number = df_meta[df_meta['cluster'] == f'{i}'].shape[0] # 
         cell_number_list.append(cell_number)
-        car_cell_number = df_meta[ (df_meta['Class'] == 'positive') & (df_meta['celltype'] == f'{i}') ].shape[0] #
+        car_cell_number = df_meta[ (df_meta['Class'] == 'positive') & (df_meta['cluster'] == f'{i}') ].shape[0] #
         car_cell_number_list.append(car_cell_number)
 
     for _i in range(len(row0)):
