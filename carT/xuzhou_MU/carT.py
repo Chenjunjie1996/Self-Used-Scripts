@@ -22,7 +22,7 @@ def run_count(outdir, sample):
 
     report = xlwt.Workbook()
     sheet = report.add_sheet('CART-Count')
-    row0 = [f"{sample}_celltype", "Cluster", "CellNumber", "Cell With CAR"]
+    row0 = [f"{sample}_celltype", "Cluster", "CellNumber", "Cell With CAR", "cell with CAR percent"]
 
     cell_type_list = list(df_meta['cluster'].unique()) #
     cluster_list, cell_number_list, car_cell_number_list = [], [], []
@@ -37,11 +37,16 @@ def run_count(outdir, sample):
 
     for _i in range(len(row0)):
         sheet.write(0, _i, row0[_i])
+
+    car_cell_percent_list = [round(x / y * 100, 2) for x, y in zip(car_cell_number_list, cell_number_list)]
+    car_cell_percent_list = [str(i) + '%' for i in car_cell_percent_list]
+
     for _i in range(len(cell_type_list)):
         sheet.write(_i+1, 0, cell_type_list[_i])
         sheet.write(_i+1, 1, cluster_list[_i])
         sheet.write(_i+1, 2, cell_number_list[_i])
         sheet.write(_i+1, 3, car_cell_number_list[_i])
+        sheet.write(_i+1, 4, car_cell_percent_list[_i])
 
     report.save(f'{outdir}/{sample}_CART_count.xls')
     return report
