@@ -1,4 +1,4 @@
 conda activate cjjdev
-1. python /SGRNJ03/randd/cjj/Script/get_10Xvdj_ref/imgt.py --genome vdj_IMGT_mouse -species "Mus musculus"
+1. python /SGRNJ03/randd/cjj/Script/get_10Xvdj_ref/imgt.py --genome vdj_IMGT_mouse --species "Mus musculus"
 2. /SGRNJ03/randd/cjj/soft/cellranger/cellranger-6.1.2/cellranger mkvdjref --genome=vdj_IMGT_mouse --seqs=vdj_IMGT_mouse-mkvdjref-input.fasta
 example:/SGRNJ03/randd/cjj/celedev/vdj10x/20220223mkref/script/rabbit
