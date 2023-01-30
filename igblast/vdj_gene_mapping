@@ -14,14 +14,14 @@ class AIRR:
 	def parse_airr_file(self):
 		df = pd.read_csv(self.df, sep='\t')
 		df = df.fillna("")
-		total_umis = format(df.shape[0], ',')
-		print(f"Total umi number: {total_umis}")
-
 		df.rename(columns={
 			"v_call": "v_gene",
 			"d_call": "d_gene",
 			"j_call": "j_gene"
 		}, inplace=True)
+
+		total_umis = format(df.shape[0], ',')
+		print(f"Total umi number: {total_umis}")
 
 		vdj_gene = ["v_gene", "d_gene", "j_gene"]
 		for gene in vdj_gene:
