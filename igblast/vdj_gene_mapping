@@ -14,16 +14,19 @@ class AIRR:
 	def parse_airr_file(self):
 		df = pd.read_csv(self.df, sep='\t')
 		df = df.fillna("")
-		total_umis = df.shape[0]
+		total_umis = format(df.shape[0], ',')
 		print(f"Total umi number: {total_umis}")
 
-		v_call = df[df["v_call"]!=""].shape[0]
-		d_call = df[df["d_call"]!=""].shape[0]
-		j_call = df[df["j_call"]!=""].shape[0]
-		print(f"Total mapping to v_gene numebr: {v_call}")
-		print(f"Total mapping to d_gene number: {d_call}")
-		print(f"Total mapping to j_gene number: {j_call}")
-		print("====================================")	
+		df.rename(columns={
+			"v_call": "v_gene",
+			"d_call": "d_gene",
+			"j_call": "j_gene"
+		}, inplace=True)
+
+		vdj_gene = ["v_gene", "d_gene", "j_gene"]
+		for gene in vdj_gene:
+			gene_num = df[df[gene]!=""].shape[0]
+			print(f"Total mapping to {gene} numebr: {format(gene_num, ',')}")
 
 		if df["locus"][0].startswith("TR"):
 			chains = ["TRA", "TRB"]
@@ -32,13 +35,12 @@ class AIRR:
 
 		for chain in chains:
 			df_chain = df[df["locus"]==chain]
-			v_call = df_chain[df_chain["v_call"] != ""].shape[0]
-			d_call = df_chain[df_chain["d_call"] != ""].shape[0]
-			j_call = df_chain[df_chain["j_call"] != ""].shape[0]
-			print(f"{chain} umi number: {df_chain.shape[0]}")
-			print(f"{chain} mapping to v_gene numebr: {v_call}")
-			print(f"{chain} mapping to d_gene number: {d_call}")
-			print(f"{chain} mapping to j_gene number: {j_call}")
+			umis = format(df_chain.shape[0], ',')
+			print(f"{chain} umi number: {umis}")
+
+			for gene in vdj_gene:
+				gene_num = df_chain[df_chain[gene] != ""].shape[0]
+				print(f"{chain} mapping to {gene} numebr: {format(gene_num, ',')}")
 
 
 if __name__ == '__main__':
