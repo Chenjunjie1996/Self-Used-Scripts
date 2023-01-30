@@ -1,0 +1,28 @@
+#!/usr/bin/python
+import pandas as pd 
+import sys
+
+
+class AIRR:
+	
+	def __init__(self, df):
+		self.df	= df
+	
+	def __call__(self):
+		self.parse_airr_file()
+	
+	def parse_airr_file(self):
+		df = pd.read_csv(self.df, sep='\t')
+		df = df.fillna("")
+		total_umis = df.shape[0]
+		v_call = df[df["v_call"]!=""].shape[0]
+		d_call = df[df["d_call"]!=""].shape[0]
+		j_call = df[df["j_call"]!=""].shape[0]
+		print(f"Total umi number: {total_umis}")
+		print(f"mapping to v_gene numebr: {v_call}")
+		print(f"mapping to d_gene number: {d_call}")
+		print(f"mapping to j_gene number: {j_call}")	
+
+
+if __name__ == '__main__':
+	AIRR(sys.argv[1])()
