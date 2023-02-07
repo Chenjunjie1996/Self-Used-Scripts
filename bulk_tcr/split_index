@@ -1,0 +1,82 @@
+#!/usr/bin/python
+import pysam
+import argparse
+import os
+import pandas as pd
+from collections import defaultdict
+from xopen import xopen
+
+
+class Split_index:
+    
+    def __init__(self, args):
+        self.mapfile = args.mapfile
+        self.whitelist = args.whitelist
+
+    def __call__(self):
+        self.run()
+    
+    @staticmethod
+    def read_one_col(whitelist):
+        """
+        Read file with one column. Strip each line.
+        Returns col_list, line number
+        """
+        df = pd.read_csv(whitelist, header=None)
+        col1 = list(df.iloc[:, 0])
+        col1 = [item.strip() for item in col1]
+        num = len(col1)
+        return col1, num
+
+    @staticmethod
+    def parse_mapfile(mapfile):
+        df = pd.read_csv(mapfile, sep='\t', header=None)
+        fq_dict = defaultdict(list)
+        for i in range(df.shape[0]):
+            library_id, library_path = df[0][i], df[1][i]
+            fq_dict[library_id].append(f"{library_path}/{library_id}_R1.fastq.gz")
+            fq_dict[library_id].append(f"{library_path}/{library_id}_R2.fastq.gz")
+        return fq_dict
+
+    @staticmethod
+    def write_new_mapfile(rawdata_path_after_split):
+        library_id_list = sorted(set([i.split("_")[0] for i in os.listdir(rawdata_path_after_split)]))
+        with open("new_mapfile", 'w') as f:
+            for i in range(len(library_id_list)):
+                f.write(f"{library_id_list[i]}\t{rawdata_path_after_split}\t{library_id_list[i]}\n")
+
+    def run(self):
+        outdir = "rawdata"
+        os.system(f"mkdir {outdir}")
+        index_list, index_num = self.read_one_col(args.whitelist)
+        fq_dict = self.parse_mapfile(args.mapfile)
+        
+        for library_id in fq_dict:
+            fq1, fq2 = fq_dict[library_id]
+            out_fq1_list = [xopen(f"{outdir}/{library_id}{chr(101+i).upper()}_R1.fastq.gz", 'w') for i in range(index_num)]
+            out_fq2_list = [xopen(f"{outdir}/{library_id}{chr(101+i).upper()}_R2.fastq.gz", 'w') for i in range(index_num)]
+            with pysam.FastxFile(fq1, persist=False) as fq1, \
+                    pysam.FastxFile(fq2, persist=False) as fq2:
+                for entry1, entry2 in zip(fq1, fq2):
+                    header1, seq1, qual1, comment1 = entry1.name, entry1.sequence, entry1.quality, entry1.comment
+                    header2, seq2, qual2, comment2 = entry2.name, entry2.sequence, entry2.quality, entry2.comment
+
+                    for i in range(index_num):
+                        if seq1[18:24] == index_list[i]:
+                            out_fq1_list[i].write(f"@{header1} {comment1}\n{seq1}\n+\n{qual1}\n")
+                            out_fq2_list[i].write(f"@{header2} {comment2}\n{seq2}\n+\n{qual2}\n")
+
+            for i in range(index_num):
+                out_fq1_list[i].close()
+                out_fq2_list[i].close()
+
+        self.write_new_mapfile(outdir)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="split index for bulk vdj")
+    parser.add_argument("--mapfile", help="mapfile", required=True)
+    parser.add_argument("--whitelist", help="whitelist", required=True)
+    args = parser.parse_args()
+    Split_index(args)()
+        
