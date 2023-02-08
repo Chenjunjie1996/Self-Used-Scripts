@@ -28,7 +28,8 @@ class AIRR:
 			gene_num = df[df[gene]!=""].shape[0]
 			print(f"Total mapping to {gene} numebr: {format(gene_num, ',')}")
 
-		if df["locus"][0].startswith("TR"):
+		chains = list(df["locus"])
+		if max(set(chains),key=chains.count).startswith("TR"):
 			chains = ["TRA", "TRB"]
 		else:
 			chains = ["IGH", "IGK", "IGL"]
