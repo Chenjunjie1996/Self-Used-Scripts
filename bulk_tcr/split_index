@@ -53,8 +53,9 @@ class Split_index:
         
         for library_id in fq_dict:
             fq1, fq2 = fq_dict[library_id]
-            out_fq1_list = [xopen(f"{outdir}/{library_id}{chr(101+i).upper()}_R1.fastq.gz", 'w') for i in range(index_num)]
-            out_fq2_list = [xopen(f"{outdir}/{library_id}{chr(101+i).upper()}_R2.fastq.gz", 'w') for i in range(index_num)]
+            # chr(101+i).upper()
+            out_fq1_list = [xopen(f"{outdir}/{library_id}_index{i}_R1.fastq.gz", 'w') for i in range(index_num)]
+            out_fq2_list = [xopen(f"{outdir}/{library_id}_index{i}_R2.fastq.gz", 'w') for i in range(index_num)]
             with pysam.FastxFile(fq1, persist=False) as fq1, \
                     pysam.FastxFile(fq2, persist=False) as fq2:
                 for entry1, entry2 in zip(fq1, fq2):
