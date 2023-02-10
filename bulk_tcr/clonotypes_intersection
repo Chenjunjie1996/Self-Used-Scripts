@@ -25,20 +25,31 @@ class Clonotypes:
 
         df1 = pd.read_csv(self.args.clonotype1_file)
         df2 = pd.read_csv(self.args.clonotype2_file)
-        df1 = df1.head(200)
-        df2 = df2.head(200)
+        df1_top200 = df1.head(200)
+        df2_top200 = df2.head(200)
 
         # write intersection clonotypes
         df_intersection = pd.merge(df1, df2, on="aaSeqCDR3", suffixes=(self.sample1, self.sample2))
         df_intersection.to_csv(f"{dir_name}/{self.sample1}_{self.sample2}_clonotypes.csv",  index=False)
+        df_intersection = pd.merge(df1_top200, df2_top200, on="aaSeqCDR3", suffixes=(self.sample1, self.sample2))
+        df_intersection.to_csv(f"{dir_name}/{self.sample1}_{self.sample2}_clonotypes_top200.csv",  index=False)
 
+        # all
         set1 = set(df1.aaSeqCDR3)
         set2 = set(df2.aaSeqCDR3)
         print(f"Clonotypes_intersection of {self.sample1} {self.sample2} : {len(set1.intersection(set2))}")
-
         subset_ = [set1, set2]
         venn2(subset_, set_labels=(self.sample1, self.sample2), set_colors=('r', 'g'))
         plt.savefig(f"{dir_name}/Vnplot")
+        plt.clf()
+
+        # top200
+        set1 = set(df1_top200.aaSeqCDR3)
+        set2 = set(df2_top200.aaSeqCDR3)
+        print(f"TOP200 Clonotypes_intersection of {self.sample1} {self.sample2} : {len(set1.intersection(set2))}")
+        subset_ = [set1, set2]
+        venn2(subset_, set_labels=(self.sample1, self.sample2), set_colors=('r', 'g'))
+        plt.savefig(f"{dir_name}/Vnplot_top200")
 
 
 if __name__ == '__main__':
