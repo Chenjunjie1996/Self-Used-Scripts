@@ -29,9 +29,9 @@ class Clonotypes:
         df2_top200 = df2.head(200)
 
         # write intersection clonotypes
-        df_intersection = pd.merge(df1, df2, on="aaSeqCDR3", suffixes=(self.sample1, self.sample2))
+        df_intersection = pd.merge(df1, df2, on="aaSeqCDR3", suffixes=(f"_{self.sample1}", f"_{self.sample2}"))
         df_intersection.to_csv(f"{dir_name}/{self.sample1}_{self.sample2}_clonotypes.csv",  index=False)
-        df_intersection = pd.merge(df1_top200, df2_top200, on="aaSeqCDR3", suffixes=(self.sample1, self.sample2))
+        df_intersection = pd.merge(df1_top200, df2_top200, on="aaSeqCDR3", suffixes=(f"_{self.sample1}", f"_{self.sample2}"))
         df_intersection.to_csv(f"{dir_name}/{self.sample1}_{self.sample2}_clonotypes_top200.csv",  index=False)
 
         # all
@@ -40,7 +40,7 @@ class Clonotypes:
         print(f"Clonotypes_intersection of {self.sample1} {self.sample2} : {len(set1.intersection(set2))}")
         subset_ = [set1, set2]
         venn2(subset_, set_labels=(self.sample1, self.sample2), set_colors=('r', 'g'))
-        plt.savefig(f"{dir_name}/Vnplot")
+        plt.savefig(f"{dir_name}/{self.sample1}_{self.sample2}_Vnplot")
         plt.clf()
 
         # top200
@@ -49,7 +49,7 @@ class Clonotypes:
         print(f"TOP200 Clonotypes_intersection of {self.sample1} {self.sample2} : {len(set1.intersection(set2))}")
         subset_ = [set1, set2]
         venn2(subset_, set_labels=(self.sample1, self.sample2), set_colors=('r', 'g'))
-        plt.savefig(f"{dir_name}/Vnplot_top200")
+        plt.savefig(f"{dir_name}/{self.sample1}_{self.sample2}_Vnplot_top200")
 
 
 if __name__ == '__main__':
