@@ -2,3 +2,7 @@ conda activate cjjdev
 1. python /SGRNJ03/randd/cjj/Script/get_10Xvdj_ref/imgt.py --genome vdj_IMGT_mouse --species "Mus musculus"
 2. /SGRNJ03/randd/cjj/soft/cellranger/cellranger-6.1.2/cellranger mkvdjref --genome=vdj_IMGT_mouse --seqs=vdj_IMGT_mouse-mkvdjref-input.fasta
 example:/SGRNJ03/randd/cjj/celedev/vdj10x/20220223mkref/script/rabbit
+
+20230215: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230214rabbit/cr7ref/D38/03.assemble
+ref: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230214rabbit/rabbit_ref/test/
+change c_query2 = "14.1" to c_query2 = "7.2"
