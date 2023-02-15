@@ -4,5 +4,5 @@ conda activate cjjdev
 example:/SGRNJ03/randd/cjj/celedev/vdj10x/20220223mkref/script/rabbit
 
 20230215: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230214rabbit/cr7ref/D38/03.assemble
-ref: /SGRNJ06/randd/USER/cjj/soft/refdata-cellranger-vdj-rabbit
+rabbit ref: /SGRNJ06/randd/USER/cjj/soft/refdata-cellranger-vdj-rabbit
 change imgt.py c_query2 = "14.1" to c_query2 = "7.2"
