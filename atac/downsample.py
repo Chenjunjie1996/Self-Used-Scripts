@@ -43,19 +43,27 @@ def add_log(func):
 
 
 class Downsample:
+    
     def __init__(self, args):
         self.args = args
 
         self.fq_list = glob.glob(f"{self.args.fq_path}/*_R*.fastq*")
+        self.index_list = glob.glob(f"{self.args.fq_path}/*_I*.fastq*")
         self.fq_list = sorted([i for i in self.fq_list if os.path.isfile(i)])
+        self.index_list = [i for i in self.index_list if os.path.isfile(i)]
+        
         print(f" Downsample List : \n{self.fq_list}")
 
         assert len(self.fq_list) == 3
-
+        assert len(self.index_list) == 1
+        
         self.fq1, self.fq2, self.fq3 = self.fq_list[0], self.fq_list[1], self.fq_list[2]
+        self.index1 = self.index_list[0]
         self.out_fq1 = f"{self.args.outdir}/downsample_{self.fq1.split('/')[-1]}"
         self.out_fq2 = f"{self.args.outdir}/downsample_{self.fq2.split('/')[-1]}"
         self.out_fq3 = f"{self.args.outdir}/downsample_{self.fq3.split('/')[-1]}"
+        self.out_index1 = f"{self.args.outdir}/downsample_{self.index1.split('/')[-1]}"
+        
 
     def __call__(self, *args, **kwargs):
         self.run()
@@ -68,29 +76,35 @@ class Downsample:
         self.fh_fq1 = xopen(self.out_fq1, 'w')
         self.fh_fq2 = xopen(self.out_fq2, 'w')
         self.fh_fq3 = xopen(self.out_fq3, 'w')
+        self.fh_index1 = xopen(self.out_index1, 'w')
 
         count = 0
         with pysam.FastxFile(self.fq1, persist=False) as fq1, \
                 pysam.FastxFile(self.fq2, persist=False) as fq2, \
-                pysam.FastxFile(self.fq3, persist=False) as fq3:
+                    pysam.FastxFile(self.fq3, persist=False) as fq3, \
+                        pysam.FastxFile(self.index1, persist=False) as index1:
 
-            for entry1, entry2, entry3 in zip(fq1, fq2, fq3):
+            for entry1, entry2, entry3, entry4 in zip(fq1, fq2, fq3, index1):
                 count += 1
                 if count > self.args.reads_num:
                     break
                 self.fh_fq1.write(f"{entry1}\n")
                 self.fh_fq2.write(f"{entry2}\n")
                 self.fh_fq3.write(f"{entry3}\n")
+                self.fh_index1.write(f"{entry4}\n")
 
                 if count % 1000000 == 0:
                     self.run.logger.info(f'Downsample {count} reads done.')
+
+
             self.run.logger.info(self.fq1 + ' finished.')
 
 
         self.fh_fq1.close()
         self.fh_fq2.close()
         self.fh_fq3.close()
-
+        self.fh_index1.close()
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Downsample fastq file")
