@@ -53,6 +53,7 @@ class Circos:
     def __init__(self, args):
         self.seqtype = args.seqtype
         self.outdir = args.outdir
+        self.split_pair = args.split_pair
         self.consensus = glob.glob(f"{args.sample_path}/03.assemble/*/outs/consensus_annotations.csv")[0]
         self.clonotype = glob.glob(f"{args.sample_path}/03.assemble/*/outs/clonotypes.csv")[0]
         self.sample = self.clonotype.split('/')[-3]
@@ -84,32 +85,54 @@ class Circos:
         df_consensus.rename(
             columns={"v_gene": "v", "d_gene": "d", "j_gene": "j", "cdr3_nt": "cdr3nt", "cdr3": "cdr3aa"}, inplace=True)
 
-        for chain in CHAIN[self.seqtype]:
-            df_tmp = df_consensus[df_consensus["chain"] == chain]
-            df_tmp = pd.merge(df_tmp, df_clonotype)
+        if not self.split_pair:
+            df_tmp = pd.merge(df_consensus, df_clonotype)
             df_tmp.sort_values(by="count", ascending=False, inplace=True)
             df_tmp = df_tmp[["count", "freq", "cdr3nt", "cdr3aa", "v", "d", "j"]]
-            df_tmp.to_csv(f"{self.outdir}/{self.sample}_{chain}.txt", sep='\t', index=False)
+            df_tmp.to_csv(f"{self.outdir}/{self.sample}.txt", sep='\t', index=False)
+        else:
+            for chain in CHAIN[self.seqtype]:
+                df_tmp = df_consensus[df_consensus["chain"] == chain]
+                df_tmp = pd.merge(df_tmp, df_clonotype)
+                df_tmp.sort_values(by="count", ascending=False, inplace=True)
+                df_tmp = df_tmp[["count", "freq", "cdr3nt", "cdr3aa", "v", "d", "j"]]
+                df_tmp.to_csv(f"{self.outdir}/{self.sample}_{chain}.txt", sep='\t', index=False)
 
     @add_log
     def calc_vj(self):
-        for chain in CHAIN[self.seqtype]:
+        if not self.split_pair:
             cmd = (
                 f"java -jar /SGRNJ06/randd/USER/cjj/soft/vdjtools/vdjtools-1.2.1/vdjtools-1.2.1.jar PlotFancyVJUsage "
-                f"{self.sample}_{chain}.txt "
-                f"{self.sample}_{chain} "
+                f"{self.sample}.txt "
+                f"{self.sample} "
             )
             subprocess.check_call(cmd, shell=True)
+        else:
+            for chain in CHAIN[self.seqtype]:
+                cmd = (
+                    f"java -jar /SGRNJ06/randd/USER/cjj/soft/vdjtools/vdjtools-1.2.1/vdjtools-1.2.1.jar PlotFancyVJUsage "
+                    f"{self.sample}_{chain}.txt "
+                    f"{self.sample}_{chain} "
+                )
+                subprocess.check_call(cmd, shell=True)
 
     @add_log
     def make_plot(self):
-        for chain in CHAIN[self.seqtype]:
+        if not self.split_pair:
             cmd = (
                 f"Rscript {ROOT_DIR}/vj_pairing_plot.r "
-                f"{self.sample}_{chain}.fancyvj.wt.txt "
-                f"{self.sample}_{chain}.fancyvj.wt.png "
+                f"{self.sample}.fancyvj.wt.txt "
+                f"{self.sample}.fancyvj.wt.png "
             )
             subprocess.check_call(cmd, shell=True)
+        else:
+            for chain in CHAIN[self.seqtype]:
+                cmd = (
+                    f"Rscript {ROOT_DIR}/vj_pairing_plot.r "
+                    f"{self.sample}_{chain}.fancyvj.wt.txt "
+                    f"{self.sample}_{chain}.fancyvj.wt.png "
+                )
+                subprocess.check_call(cmd, shell=True)
 
 
 if __name__ == '__main__':
@@ -117,5 +140,6 @@ if __name__ == '__main__':
     parser.add_argument("sample_path", help="absolute sample path of flv_CR")
     parser.add_argument("--seqtype", help="TCR or BCR", default='TCR')
     parser.add_argument("--outdir", help="output_dir", default='VJUsage')
+    parser.add_argument('--split_pair', help='split pair', action='store_true')
     args = parser.parse_args()
     Circos(args)()
