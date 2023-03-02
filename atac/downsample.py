@@ -73,10 +73,10 @@ class Downsample:
         if not os.path.exists(self.args.outdir):
             os.system(f"mkdir -p {self.args.outdir}")
 
-        self.fh_fq1 = xopen(self.out_fq1, 'w')
-        self.fh_fq2 = xopen(self.out_fq2, 'w')
-        self.fh_fq3 = xopen(self.out_fq3, 'w')
-        self.fh_index1 = xopen(self.out_index1, 'w')
+        fh_fq1 = xopen(self.out_fq1, 'w')
+        fh_fq2 = xopen(self.out_fq2, 'w')
+        fh_fq3 = xopen(self.out_fq3, 'w')
+        fh_index1 = xopen(self.out_index1, 'w')
 
         count = 0
         with pysam.FastxFile(self.fq1, persist=False) as fq1, \
@@ -88,10 +88,10 @@ class Downsample:
                 count += 1
                 if count > self.args.reads_num:
                     break
-                self.fh_fq1.write(f"{entry1}\n")
-                self.fh_fq2.write(f"{entry2}\n")
-                self.fh_fq3.write(f"{entry3}\n")
-                self.fh_index1.write(f"{entry4}\n")
+                fh_fq1.write(f"@{entry1.name}\n{entry1.sequence}\n+\n{entry1.quality}\n")
+                fh_fq2.write(f"@{entry2.name}\n{entry2.sequence}\n+\n{entry2.quality}\n")
+                fh_fq3.write(f"@{entry3.name}\n{entry3.sequence}\n+\n{entry3.quality}\n")
+                fh_index1.write(f"@{entry4.name}\n{entry4.sequence}\n+\n{entry4.quality}\n")
 
                 if count % 1000000 == 0:
                     self.run.logger.info(f'Downsample {count} reads done.')
@@ -100,10 +100,10 @@ class Downsample:
             self.run.logger.info(self.fq1 + ' finished.')
 
 
-        self.fh_fq1.close()
-        self.fh_fq2.close()
-        self.fh_fq3.close()
-        self.fh_index1.close()
+        fh_fq1.close()
+        fh_fq2.close()
+        fh_fq3.close()
+        fh_index1.close()
         
 
 if __name__ == '__main__':
