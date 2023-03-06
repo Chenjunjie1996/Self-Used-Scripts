@@ -40,7 +40,8 @@ class Split_index:
 
     @staticmethod
     def write_new_mapfile(rawdata_path_after_split):
-        library_id_list = sorted(set([i.split("_")[0] for i in os.listdir(rawdata_path_after_split)]))
+        library_id_list = sorted(set([f"{i.split('_')[0]}_{i.split('_')[1]}" for i in os.listdir(rawdata_path_after_split)]),
+                                 key=lambda x: int(x.split("index")[-1]))
         with open("new_mapfile", 'w') as f:
             for i in range(len(library_id_list)):
                 f.write(f"{library_id_list[i]}\t{rawdata_path_after_split}\t{library_id_list[i]}\n")
@@ -48,8 +49,8 @@ class Split_index:
     def run(self):
         outdir = "rawdata"
         os.system(f"mkdir {outdir}")
-        index_list, index_num = self.read_one_col(args.whitelist)
-        fq_dict = self.parse_mapfile(args.mapfile)
+        index_list, index_num = self.read_one_col(self.whitelist)
+        fq_dict = self.parse_mapfile(self.mapfile)
         
         for library_id in fq_dict:
             fq1, fq2 = fq_dict[library_id]
