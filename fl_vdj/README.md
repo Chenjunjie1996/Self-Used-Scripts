@@ -21,4 +21,5 @@
 2. groupby barcode chain，取最高umi的链
 3. 仅call回双链细胞。
 4. calling回的细胞合并至filtered annotation文件
+5. outdir: 07.cell_calling 
 ---

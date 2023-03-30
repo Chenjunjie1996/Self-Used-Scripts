@@ -210,7 +210,7 @@ class VDJ_calling:
         df_umi['barcode'] = df_umi['barcode'].apply(lambda x: self.tenX_sgr[x.split('-')[0]])
 
         df_umi.to_csv(f"{self.out_dir}/count.txt", sep='\t', index=False)
-        self.add_data(chart=get_plot_elements.plot_barcode_rank(self.count_file))
+        # self.add_data(chart=get_plot_elements.plot_barcode_rank(self.count_file))
 
     @utils.add_log
     def render_html(self, calling_cells, df_merge, df_match):
