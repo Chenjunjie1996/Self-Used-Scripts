@@ -11,8 +11,6 @@
 4. calling回的细胞合并至filtered annotation文件
 5. outdir: 07.cell_calling 
 ---
-
----
 ### cell calling more cells for flv_cr result
 - usage: python cell_calling_more.py --cr_dir --match_dir
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230330beida_cellcall
