@@ -104,15 +104,108 @@ def gen_clonotypes_table(df, out_clonotypes):
     df_clonetypes.to_csv(out_clonotypes, sep=',', index=False)
 
 
+class Filter_noise:
+    """ Filter noise barcode.
+    auto:
+    keep paired-chain barcode when highest umi of contig >= 2 * second highest umi of contig.
+    
+    snr:
+    https://www.nature.com/articles/s41598-017-18303-z#:~:text=The%20signal%2Dto%2Dnoise%20ratio,of%20background%20pixel%20intensity%2C%20respectively.
+    keep paired-chain barcode when SNR value >= coefficient.
+    The signal-to-noise ratio (SNR) of the single molecules was defined as SNR = (S − B)/σ,
+    where S is the peak single molecule pixel intensity and B and 
+    σ are the average and standard deviation of background pixel intensity, respectively.
+    
+    not_filter:
+    for paired-chain barcode, keep highest tra and trb chain.
+    """
+    
+    def __init__(self, args, df):
+        self.method = args.method
+        self.coeff = float(args.coeff)
+        self.df = df
+        self.df.sort_values("umis", ascending=False, inplace=True)
+    
+    @utils.add_log
+    def __call__(self):
+        
+        if not self.method:
+            self.df = self.df.groupby(["barcode", "chain"], as_index=False).head(1)
+            self.df = self.df.groupby("barcode").filter(lambda x: (len(x) > 1))
+        else:
+            bc_chain_dict = self.df.groupby("barcode")["chain"].apply(lambda x: set(x)).to_dict()
+            pair_chain_dict = {key: value for key, value in bc_chain_dict.items() if len(value)==2}
+            self.df = self.df[self.df["barcode"].isin(pair_chain_dict)]
+            self.df.sort_values(["barcode","umis"], ascending=[False, False], inplace=True)
+            
+            # 有多条TRA或TRB的barcode
+            df_multi_chain = self.df.groupby("barcode").filter(lambda x: (len(x) > 2))
+            # 仅有一条TRA和一条TRB的barcode
+            df_pair_chain = self.df.groupby("barcode").filter(lambda x: (len(x) == 2))
+            df_tra = df_multi_chain[df_multi_chain['chain'] == 'TRA']
+            df_trb = df_multi_chain[df_multi_chain['chain'] == 'TRB']
+            tra_dict = df_tra.groupby("barcode")["umis"].apply(lambda x: x.tolist()).to_dict()
+            trb_dict = df_trb.groupby("barcode")["umis"].apply(lambda x: x.tolist()).to_dict()
+
+            if self.method == "auto":
+                for tr_dict in [tra_dict, trb_dict]:
+                    for k in tr_dict:
+                        if len(tr_dict[k]) == 1:
+                            tr_dict[k].append(0.1)
+
+                # highest umi of contig >= coeff * second highest umi of contig
+                filter_noise_tra = {key for key,value in tra_dict.items() if value[0]/value[1] >= self.coeff}
+                filter_noise_trb = {key for key,value in trb_dict.items() if value[0]/value[1] >= self.coeff}
+                
+            elif self.method == "snr":
+                for tr_dict in [tra_dict, trb_dict]:
+                    for k in tr_dict:
+                        if len(tr_dict[k]) == 1:
+                            tr_dict[k].append(tr_dict[k][0])
+                
+                filter_noise_tra = self.snr_filter(tra_dict, self.coeff)
+                filter_noise_trb = self.snr_filter(trb_dict, self.coeff)
+                        
+            filter_noise_barcode = filter_noise_tra & filter_noise_trb | set(df_pair_chain.barcode)
+            self.df = self.df[self.df["barcode"].isin(filter_noise_barcode)]
+        
+        return self.df
+
+    
+    @staticmethod
+    def snr_filter(tr_dict, coeff):
+        """ calculate SNR for each barcode
+
+        :param tr_dict: {'AAACATCGAAGGACACCCTAATCC': [7, 3, 1],
+                         'AAACATCGAATCCGTCCATCAAGT': [10, 2, 1],
+                         'AAACATCGAATCCGTCCCGACAAC': [4, 3],
+                         }
+        :return: {AAACATCGAAGGACACCCTAATCC, AAACATCGAATCCGTCCATCAAGT}
+        """
+        filter_noise_barcode = set()
+        for k, v in tr_dict.items():
+            S, noise = v[0], v[1:]
+            B = np.mean(noise)
+            O = np.std(noise)
+            if O == 0:
+                filter_noise_barcode.add(k)
+                continue
+            SNR = (S-B)/O
+            if SNR >= coeff:
+                filter_noise_barcode.add(k)
+
+        return filter_noise_barcode
+
+
 class VDJ_calling:
     """
-    cell calling for cellranger result.
-    对 is_cell=False的细胞 calling部分主要由于组装出多条productive链而不被判定为细胞的barcode。
+    cell calling for flv_CR result.
+    对is_cell=False的细胞 calling回组装出多条productive链而不被判定为细胞的barcode。
     条件:
-    1. 满足productive=True
-    2. groupby barcode chain，取最高umi的链
-    3. 仅call回双链细胞。
-    4. calling回的细胞合并至filtered annotation文件
+        1.满足productive=True, is_cell=False
+        2.对这样的barcode中的contig进行过滤：SNR, AUTO, NOT_FILTER
+        3.仅call回双链细胞，calling回的细胞合并至filtered annotation文件
+        4.生成新的结果文件和报告 outdir: 07.cell_calling
     """
 
     def __init__(self, args):
@@ -150,14 +243,15 @@ class VDJ_calling:
             justify="center")
         table_dict['id'] = table_id
         return table_dict
-
+    
     @utils.add_log
     def cell_calling(self):
         df_productive = self.all_contig_anno[self.all_contig_anno["productive"] == True]
         df_call = df_productive[df_productive["is_cell"] == False]
-        df_call = df_call.sort_values("umis", ascending=False)
-        df_call = df_call.groupby(["barcode", "chain"], as_index=False).head(1)
-        df_call = df_call.groupby("barcode").filter(lambda x: (len(x) > 1))
+        # df_call = df_call.sort_values("umis", ascending=False)
+        # df_call = df_call.groupby(["barcode", "chain"], as_index=False).head(1)
+        # df_call = df_call.groupby("barcode").filter(lambda x: (len(x) > 1))
+        df_call = Filter_noise(args, df_call)()
         df_merge = pd.concat([self.filter_contig_anno, df_call])
         calling_cells = set(df_merge.barcode)
         calling_contigs = set(df_merge.contig_id)
@@ -219,6 +313,7 @@ class VDJ_calling:
         fh.close()
 
         """
+        Cells
         Estimated Number of Cells	6,983
         Fraction Reads in Cells	28.2%
         Mean Reads per Cell	5,756
@@ -240,7 +335,8 @@ class VDJ_calling:
         data["cells_summary"]["metric_list"][3]["display"] = str(format(cells_reads // len(calling_cells), ','))
         data["cells_summary"]["metric_list"][4]["display"] = np.median(df_merge[df_merge["chain"]=="TRA"].umis)
         data["cells_summary"]["metric_list"][5]["display"] = np.median(df_merge[df_merge["chain"]=="TRB"].umis)
-        data["cells_summary"]["chart"] = get_plot_elements.plot_barcode_rank(f"{self.out_dir}/count.txt")
+        data["cells_summary"]["chart"] = get_plot_elements.plot_barcode_rank(f"{self.out_dir}/count.txt",  log_uniform=True)
+
 
         """
         Annotation 
@@ -261,6 +357,20 @@ class VDJ_calling:
                 if i["name"] == k:
                     i["display"] = f'{round(v / len(calling_cells) * 100, 2)}%'
 
+        """
+        Match 
+        Cells Match with ScRNA-seq Analysis	1,128
+        Cells With Productive V-J Spanning Pair	727(64.45%)
+        Cells With Productive V-J Spanning (TRA, TRB) Pair	727(64.45%)
+        Cells With TRA Contig	784(69.5%)
+        Cells With CDR3-annotated TRA Contig	784(69.5%)
+        Cells With V-J Spanning TRA Contig	784(69.5%)
+        Cells With Productive TRA Contig	784(69.5%)
+        Cells With TRB Contig	1,071(94.95%)
+        Cells With CDR3-annotated TRB Contig	1,071(94.95%)
+        Cells With V-J Spanning TRB Contig	1,071(94.95%)
+        Cells With Productive TRB Contig	1,071(94.95%)
+        """
         data["match_summary"]["metric_list"][0]["display"] = str(format(len(set(df_match.barcode)), ','))
         metrics_dict = gen_vj_annotation_metrics(df_match, seqtype="TCR")
         for k, v in metrics_dict.items():
@@ -268,6 +378,9 @@ class VDJ_calling:
                 if i["name"] == k:
                     i["display"] = f'{round(v / len(set(df_match.barcode)) * 100, 2)}%'
 
+        """
+        Clonotypes table
+        """
         gen_clonotypes_table(df_match, f"{self.out_dir}/matched_clonotypes.csv")
         title = 'Clonetypes'
         raw_clonotypes = pd.read_csv(f"{self.out_dir}/matched_clonotypes.csv", sep=',', index_col=None)
@@ -299,5 +412,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="cell calling for flv_CR result")
     parser.add_argument("--cr_dir", help="cr dir", required=True)
     parser.add_argument("--match_dir", help="match dir", required=True)
+    parser.add_argument("--method", help="filter method", default=None)
+    parser.add_argument("--coeff",
+                        help="coefficient will affect auto and snr noise filter, recommend 2 for auto, 10 for snr",
+                        default=2
+                        )
     args = parser.parse_args()
     VDJ_calling(args)()
