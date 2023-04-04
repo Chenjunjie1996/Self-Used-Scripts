@@ -124,73 +124,98 @@ class Filter_noise:
         self.method = args.method
         self.coeff = float(args.coeff)
         self.df = df
-        self.df.sort_values("umis", ascending=False, inplace=True)
+        self.seqtype = args.seqtype
+        self.df = self.df.sort_values("umis", ascending=False)
     
     @utils.add_log
     def __call__(self):
         
-        if not self.method:
-            self.df = self.df.groupby(["barcode", "chain"], as_index=False).head(1)
-            self.df = self.df.groupby("barcode").filter(lambda x: (len(x) > 1))
-        else:
+        if self.method:
             bc_chain_dict = self.df.groupby("barcode")["chain"].apply(lambda x: set(x)).to_dict()
-            pair_chain_dict = {key: value for key, value in bc_chain_dict.items() if len(value)==2}
+            if self.seqtype == "TCR":
+                pair_chain_dict = {key: value for key, value in bc_chain_dict.items() if len(value)==2}
+            else:
+                pair_chain_dict = {key: value for key, value in bc_chain_dict.items() if len(value)>=2 and "IGH" in value}
             self.df = self.df[self.df["barcode"].isin(pair_chain_dict)]
-            self.df.sort_values(["barcode","umis"], ascending=[False, False], inplace=True)
+            self.df = self.df.sort_values(["barcode","umis"], ascending=[False, False])
             
-            # 有多条TRA或TRB的barcode
+            # 有多条重链或轻链的barcode
             df_multi_chain = self.df.groupby("barcode").filter(lambda x: (len(x) > 2))
-            # 仅有一条TRA和一条TRB的barcode
+            # 仅有一对轻重链配对的barcode
             df_pair_chain = self.df.groupby("barcode").filter(lambda x: (len(x) == 2))
-            df_tra = df_multi_chain[df_multi_chain['chain'] == 'TRA']
-            df_trb = df_multi_chain[df_multi_chain['chain'] == 'TRB']
-            tra_dict = df_tra.groupby("barcode")["umis"].apply(lambda x: x.tolist()).to_dict()
-            trb_dict = df_trb.groupby("barcode")["umis"].apply(lambda x: x.tolist()).to_dict()
+            
+            if self.seqtype == "TCR":
+                df_heavy = df_multi_chain[df_multi_chain['chain'] == 'TRB']
+                df_light = df_multi_chain[df_multi_chain['chain'] == 'TRA']
+            else:
+                df_heavy = df_multi_chain[(df_multi_chain['chain'] == 'IGH')] 
+                df_light = df_multi_chain[(df_multi_chain['chain'] == 'IGL') | (df_multi_chain['chain'] =='IGK')]
+            light_dict = df_light.groupby("barcode")["umis"].apply(lambda x: x.tolist()).to_dict()
+            heavy_dict = df_heavy.groupby("barcode")["umis"].apply(lambda x: x.tolist()).to_dict()
 
             if self.method == "auto":
-                for tr_dict in [tra_dict, trb_dict]:
-                    for k in tr_dict:
-                        if len(tr_dict[k]) == 1:
-                            tr_dict[k].append(0.1)
+                for chain_dict in [light_dict, heavy_dict]:
+                    for k in chain_dict:
+                        if len(chain_dict[k]) == 1:
+                            chain_dict[k].append(0.1)
 
                 # highest umi of contig >= coeff * second highest umi of contig
-                filter_noise_tra = {key for key,value in tra_dict.items() if value[0]/value[1] >= self.coeff}
-                filter_noise_trb = {key for key,value in trb_dict.items() if value[0]/value[1] >= self.coeff}
+                filter_noise_light = {key for key,value in light_dict.items() if value[0]/value[1] >= self.coeff}
+                filter_noise_heavy = {key for key,value in heavy_dict.items() if value[0]/value[1] >= self.coeff}
                 
             elif self.method == "snr":
-                for tr_dict in [tra_dict, trb_dict]:
-                    for k in tr_dict:
-                        if len(tr_dict[k]) == 1:
-                            tr_dict[k].append(tr_dict[k][0])
+                for chain_dict in [light_dict, heavy_dict]:
+                    for k in chain_dict:
+                        if len(chain_dict[k]) == 1:
+                            chain_dict[k].append(chain_dict[k][0])
                 
-                filter_noise_tra = self.snr_filter(tra_dict, self.coeff)
-                filter_noise_trb = self.snr_filter(trb_dict, self.coeff)
+                filter_noise_light = self.snr_filter(light_dict, self.coeff)
+                filter_noise_heavy = self.snr_filter(heavy_dict, self.coeff)
                         
-            filter_noise_barcode = filter_noise_tra & filter_noise_trb | set(df_pair_chain.barcode)
+            filter_noise_barcode = filter_noise_light & filter_noise_heavy | set(df_pair_chain.barcode)
             self.df = self.df[self.df["barcode"].isin(filter_noise_barcode)]
+            
+        else:
+            self.df = self.not_filter(self.df, self.seqtype)
         
         return self.df
 
+    @staticmethod
+    def not_filter(df, seqtype):
+        """do not filter any noise, keep all paired-chain barcode"""
+        
+        if seqtype == "TCR":
+            df = df.groupby(["barcode", "chain"], as_index=False).head(1)
+            df = df.groupby("barcode").filter(lambda x: (len(x) > 1))
+        else:
+            df_chain_heavy = df[(df['chain'] == 'IGH')]
+            df_chain_light = df[(df['chain'] == 'IGL') | (df['chain'] =='IGK')]
+            df_chain_heavy.drop_duplicates(['barcode'], inplace=True)
+            df_chain_light.drop_duplicates(['barcode'], inplace=True)
+            df = pd.concat([df_chain_heavy, df_chain_light])
+        
+        return df
     
     @staticmethod
-    def snr_filter(tr_dict, coeff):
+    def snr_filter(chain_dict, coeff):
         """ calculate SNR for each barcode
-
-        :param tr_dict: {'AAACATCGAAGGACACCCTAATCC': [7, 3, 1],
+        SNR = (S − B)/σ
+        
+        :param chain_dict: {'AAACATCGAAGGACACCCTAATCC': [7, 3, 1],
                          'AAACATCGAATCCGTCCATCAAGT': [10, 2, 1],
                          'AAACATCGAATCCGTCCCGACAAC': [4, 3],
                          }
         :return: {AAACATCGAAGGACACCCTAATCC, AAACATCGAATCCGTCCATCAAGT}
         """
         filter_noise_barcode = set()
-        for k, v in tr_dict.items():
+        for k, v in chain_dict.items():
             S, noise = v[0], v[1:]
             B = np.mean(noise)
             O = np.std(noise)
             if O == 0:
                 filter_noise_barcode.add(k)
                 continue
-            SNR = (S-B)/O
+            SNR = (S - B) / O
             if SNR >= coeff:
                 filter_noise_barcode.add(k)
 
@@ -217,6 +242,8 @@ class VDJ_calling:
         self.filter_contig_fasta = glob.glob(f"{args.cr_dir}/03.assemble/*/outs/filtered_contig.fasta")[0]
         self.all_bam = glob.glob(f"{args.cr_dir}/03.assemble/*/outs/all_contig.bam")[0]
         self.match_dir = args.match_dir
+        self.seqtype = args.seqtype
+        
         self.match_cell_barcodes, _ = utils.get_barcode_from_match_dir(self.match_dir)
         with open(f"{args.cr_dir}/02.convert/barcode_convert.json", 'r') as f:
             self.tenX_sgr = json.load(f)
@@ -248,9 +275,6 @@ class VDJ_calling:
     def cell_calling(self):
         df_productive = self.all_contig_anno[self.all_contig_anno["productive"] == True]
         df_call = df_productive[df_productive["is_cell"] == False]
-        # df_call = df_call.sort_values("umis", ascending=False)
-        # df_call = df_call.groupby(["barcode", "chain"], as_index=False).head(1)
-        # df_call = df_call.groupby("barcode").filter(lambda x: (len(x) > 1))
         df_call = Filter_noise(args, df_call)()
         df_merge = pd.concat([self.filter_contig_anno, df_call])
         calling_cells = set(df_merge.barcode)
@@ -351,7 +375,7 @@ class VDJ_calling:
         Cells With V-J Spanning TRB Contig	99.1%
         Cells With Productive TRB Contig	99.0%
         """
-        metrics_dict = gen_vj_annotation_metrics(df_merge, seqtype="TCR")
+        metrics_dict = gen_vj_annotation_metrics(df_merge, self.seqtype)
         for k, v in metrics_dict.items():
             for i in data["annotation_summary"]["metric_list"]:
                 if i["name"] == k:
@@ -372,7 +396,7 @@ class VDJ_calling:
         Cells With Productive TRB Contig	1,071(94.95%)
         """
         data["match_summary"]["metric_list"][0]["display"] = str(format(len(set(df_match.barcode)), ','))
-        metrics_dict = gen_vj_annotation_metrics(df_match, seqtype="TCR")
+        metrics_dict = gen_vj_annotation_metrics(df_match, self.seqtype)
         for k, v in metrics_dict.items():
             for i in data["match_summary"]["metric_list"]:
                 if i["name"] == k:
@@ -417,5 +441,6 @@ if __name__ == '__main__':
                         help="coefficient will affect auto and snr noise filter, recommend 2 for auto, 10 for snr",
                         default=2
                         )
+    parser.add_argument("--seqtype", choices=['TCR', 'BCR'], help="TCR or BCR", required=True)
     args = parser.parse_args()
     VDJ_calling(args)()
