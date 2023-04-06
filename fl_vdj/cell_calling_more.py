@@ -13,6 +13,16 @@ from celescope.tools.plotly_plot import Bar_plot
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
+CHAIN = {
+	'TCR': ['TRA', 'TRB'], 
+	'BCR': ['IGH', 'IGL', 'IGK']
+	}
+PAIRED_CHAIN = {
+	'TCR': ['TRA_TRB'],
+	'BCR': ['IGK_IGH', 'IGL_IGH']
+}
+
+
 def fasta_line(name, seq):
     return f'>{name}\n{seq}\n'
 
@@ -55,7 +65,7 @@ def gen_vj_annotation_metrics(df, seqtype):
         return VJ_Spanning_Pair_Cells.shape[0]
 
     metric_dict = OrderedDict()
-    chains, chain_pairs = ['TRA', 'TRB'], ['TRA_TRB']
+    chains, chain_pairs = CHAIN[seqtype], PAIRED_CHAIN[seqtype]
 
     metric_dict["Cells With Productive V-J Spanning Pair"] = get_vj_spanning_pair()
 
@@ -357,8 +367,15 @@ class VDJ_calling:
         data["cells_summary"]["metric_list"][1]["display"] = f'{round(cells_reads / total_reads * 100, 2)}%'
         data["cells_summary"]["metric_list"][2]["display"] = str(format(total_reads // len(calling_cells), ','))
         data["cells_summary"]["metric_list"][3]["display"] = str(format(cells_reads // len(calling_cells), ','))
-        data["cells_summary"]["metric_list"][4]["display"] = np.median(df_merge[df_merge["chain"]=="TRA"].umis)
-        data["cells_summary"]["metric_list"][5]["display"] = np.median(df_merge[df_merge["chain"]=="TRB"].umis)
+        
+        if self.seqtype == "TCR":
+            data["cells_summary"]["metric_list"][4]["display"] = np.median(df_merge[df_merge["chain"]=="TRA"].umis)
+            data["cells_summary"]["metric_list"][5]["display"] = np.median(df_merge[df_merge["chain"]=="TRB"].umis)
+        else:
+            data["cells_summary"]["metric_list"][4]["display"] = np.median(df_merge[df_merge["chain"]=="IGH"].umis)
+            data["cells_summary"]["metric_list"][5]["display"] = np.median(df_merge[df_merge["chain"]=="IGL"].umis)
+            data["cells_summary"]["metric_list"][6]["display"] = np.median(df_merge[df_merge["chain"]=="IGK"].umis)
+            
         data["cells_summary"]["chart"] = get_plot_elements.plot_barcode_rank(f"{self.out_dir}/count.txt",  log_uniform=True)
 
 
