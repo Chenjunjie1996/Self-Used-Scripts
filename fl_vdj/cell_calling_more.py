@@ -117,7 +117,7 @@ def gen_clonotypes_table(df, out_clonotypes):
 class Filter_noise:
     """ Filter noise barcode.
     auto:
-    keep paired-chain barcode when highest umi of contig >= 2 * second highest umi of contig.
+    keep paired-chain barcode when highest umi of contig >= coeff * second highest umi of contig.
     
     snr:
     https://www.nature.com/articles/s41598-017-18303-z#:~:text=The%20signal%2Dto%2Dnoise%20ratio,of%20background%20pixel%20intensity%2C%20respectively.
@@ -235,12 +235,9 @@ class Filter_noise:
 class VDJ_calling:
     """
     cell calling for flv_CR result.
-    对is_cell=False的细胞 calling回组装出多条productive链而不被判定为细胞的barcode。
-    条件:
-        1.满足productive=True, is_cell=False
-        2.对这样的barcode中的contig进行过滤：SNR, AUTO, NOT_FILTER
-        3.仅call回双链细胞，calling回的细胞合并至filtered annotation文件
-        4.生成新的结果文件和报告 outdir: 07.cell_calling
+    Celling barcodes where "is_cell=False" and have multi productive chains.
+    There are three methods to filter noise: SNR, AUTO, NOT_FILTER
+    Generating new results and html report in 07.cell_calling
     """
 
     def __init__(self, args):
@@ -335,9 +332,8 @@ class VDJ_calling:
         df_umi = df_umi.sort_values(by='UMI', ascending=False)
         df_umi['mark'] = df_umi['barcode'].apply(lambda x: 'CB' if x in calling_cells else 'UB')
         df_umi['barcode'] = df_umi['barcode'].apply(lambda x: self.tenX_sgr[x.split('-')[0]])
-
         df_umi.to_csv(f"{self.out_dir}/count.txt", sep='\t', index=False)
-        # self.add_data(chart=get_plot_elements.plot_barcode_rank(self.count_file))
+
 
     @utils.add_log
     def render_html(self, calling_cells, df_merge, df_match):
@@ -347,13 +343,7 @@ class VDJ_calling:
         fh.close()
 
         """
-        Cells
-        Estimated Number of Cells	6,983
-        Fraction Reads in Cells	28.2%
-        Mean Reads per Cell	5,756
-        Mean Used Reads per Cell	1,518
-        Median Used TRA UMIs per Cell	4
-        Median Used TRB UMIs per Cell
+        Cells metrics
         """
         cells_reads, total_reads = 0, 0
         with pysam.AlignmentFile(self.all_bam) as f:
@@ -380,17 +370,7 @@ class VDJ_calling:
 
 
         """
-        Annotation 
-        Cells With Productive V-J Spanning Pair	49.5%
-        Cells With Productive V-J Spanning (TRA, TRB) Pair	49.5%
-        Cells With TRA Contig	74.1%
-        Cells With CDR3-annotated TRA Contig	59.6%
-        Cells With V-J Spanning TRA Contig	63.7%
-        Cells With Productive TRA Contig	50.5%
-        Cells With TRB Contig	99.3%
-        Cells With CDR3-annotated TRB Contig	99.1%
-        Cells With V-J Spanning TRB Contig	99.1%
-        Cells With Productive TRB Contig	99.0%
+        Annotation metrics
         """
         metrics_dict = gen_vj_annotation_metrics(df_merge, self.seqtype)
         for k, v in metrics_dict.items():
@@ -399,18 +379,7 @@ class VDJ_calling:
                     i["display"] = f'{round(v / len(calling_cells) * 100, 2)}%'
 
         """
-        Match 
-        Cells Match with ScRNA-seq Analysis	1,128
-        Cells With Productive V-J Spanning Pair	727(64.45%)
-        Cells With Productive V-J Spanning (TRA, TRB) Pair	727(64.45%)
-        Cells With TRA Contig	784(69.5%)
-        Cells With CDR3-annotated TRA Contig	784(69.5%)
-        Cells With V-J Spanning TRA Contig	784(69.5%)
-        Cells With Productive TRA Contig	784(69.5%)
-        Cells With TRB Contig	1,071(94.95%)
-        Cells With CDR3-annotated TRB Contig	1,071(94.95%)
-        Cells With V-J Spanning TRB Contig	1,071(94.95%)
-        Cells With Productive TRB Contig	1,071(94.95%)
+        Match metrics
         """
         data["match_summary"]["metric_list"][0]["display"] = str(format(len(set(df_match.barcode)), ','))
         metrics_dict = gen_vj_annotation_metrics(df_match, self.seqtype)
