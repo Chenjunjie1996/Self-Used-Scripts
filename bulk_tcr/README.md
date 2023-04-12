@@ -8,3 +8,6 @@
 ---
 ### vnplot online
 - http://jvenn.toulouse.inra.fr/app/example.html
+### barplot and heatmap for 96 index
+- usage: python /SGRNJ03/randd/cjj/Script/bulk_tcr/plot96index.py --path ./
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj_bulk/20230403_96/
