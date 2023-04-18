@@ -22,3 +22,5 @@
 3. 对heavy or light 链>=2条的barcode，进行背景过滤(SNR, AUTO, NOT_FILTER)
 4. outdir: 07.cell_calling 
 ---
+### Human V region + mouse C region
+- example: /SGRNJ06/randd/USER/cjj/celedev/jicuiyaokang/
