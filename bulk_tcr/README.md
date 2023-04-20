@@ -11,3 +11,6 @@
 ### barplot and heatmap for 96 index
 - usage: python /SGRNJ03/randd/cjj/Script/bulk_tcr/plot96index.py --path ./
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj_bulk/20230403_96/
+### calculate clonotypes(total number and types)
+- usage: python /SGRNJ03/randd/cjj/Script/bulk_tcr/calcu_clone.py
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj_bulk/2023041496tcr
