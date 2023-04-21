@@ -425,7 +425,7 @@ if __name__ == '__main__':
     parser.add_argument("--method", help="filter method", default=None)
     parser.add_argument("--coeff",
                         help="coefficient will affect auto and snr noise filter, recommend 2 for auto, 10 for snr",
-                        default=2
+                        default=1.5
                         )
     parser.add_argument("--seqtype", choices=['TCR', 'BCR'], help="TCR or BCR", required=True)
     args = parser.parse_args()

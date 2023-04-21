@@ -14,6 +14,7 @@
 ### cell calling more cells for flv_cr result
 - usage: python cell_calling_more.py --cr_dir --match_dir --method --coeff --seqtype
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/tmp/20230331/T1-wyz-T, /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230309ningxiaBCR_downsample/7g/SS_02
+- Added to celescope https://github.com/singleron-RD/CeleScope/pull/234
 
 对 is_cell=False的细胞 calling部分主要由于组装出多条productive链而不被判定为细胞的barcode。
 条件:
