@@ -25,3 +25,7 @@
 ---
 ### Human V region + mouse C region
 - example: /SGRNJ06/randd/USER/cjj/celedev/jicuiyaokang/
+### Human V region + Rat C region
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230423hsV_ratC
+### Rat reference
+- path: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230423hsV_ratC/ref/vdj_IMGT_rattus
