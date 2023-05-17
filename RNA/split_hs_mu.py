@@ -19,20 +19,41 @@ def split_barcode(rna_path):
     
     h5ad = sc.read_h5ad(h5ad)
     marker = pd.read_csv(marker, sep='\t')
-    marker = marker.sort_values(['cluster','avg_log2FC'],ascending=[True,False])
-    marker = marker.groupby(["cluster"], as_index=False).head(1)
-    marker = marker.set_index("cluster")["gene"].to_dict()
-    hs_cluster = [str(key-1) for key in marker if marker[key][1].isupper()]
-    mu_cluster = [str(key-1) for key in marker if marker[key][1].islower()]
+    
+    marker = marker.sort_values(['cluster', 'avg_log2FC'], ascending=[True, False])
+    marker = marker.groupby("cluster", as_index=False).head(20)
+    marker = marker.groupby('cluster')['gene'].apply(lambda x: x.tolist()).to_dict()
+    
+    hs_cluster, mu_cluster = [], []
+    
+    for k, v in marker.items():
+        count = 0
+        for gene in v:
+            if gene[1:].isupper():
+                count += 1
+            elif gene[1:].islower():
+                count -= 1
+    
+        if count > 0:
+            hs_cluster.append(str(k - 1))
+        elif count < 0:
+            mu_cluster.append(str(k - 1))
     
     hs_barcode = h5ad.obs[h5ad.obs["cluster"].isin(hs_cluster)]
     mu_barcode = h5ad.obs[h5ad.obs["cluster"].isin(mu_cluster)]
     hs_barcode = list(hs_barcode.index)
     mu_barcode = list(mu_barcode.index)
+    
+    print(
+        f"sample name: {sample_name}\n"
+        f"hs_barcode: {hs_cluster} ; {len(hs_barcode)}\n"
+        f"mu_barcode: {mu_cluster} ; {len(mu_barcode)}\n"
+    )
 
     for species in ["hs", "mu"]:
         out_dir = f"./{sample_name}_{species}/05.count/{sample_name}_matrix_10X"
-        os.system(f"mkdir -p {out_dir}")
+        if not os.path.exists(out_dir):
+            os.system(f"mkdir -p {out_dir}")
     
         if species == "hs":
             barcodes = hs_barcode
