@@ -29,5 +29,9 @@
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230423hsV_ratC
 ### Rat reference
 - path: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230423hsV_ratC/ref/vdj_IMGT_rattus
+---
 ### Downsample rawdata
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230427/downsample20g/downsample_script
+---
+### 计算单链，双链，多链数量
+- usage: python cal_chain_cell.py T/BCR
