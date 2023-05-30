@@ -36,7 +36,12 @@ cells <- subset(vdj, productive=='True')
 barcodes <- unique(cells$barcode)
 
 filter_df <- filter(df, barcode %in% barcodes)
-res <- table(filter_df$seurat_clusters)
+if ('seurat_clusters' %in% colnames(filter_df)){
+    res <- table(filter_df$seurat_clusters)
+
+} else {
+    res <- table(filter_df$seurat_cluster)
+}
 res <- as.data.frame(res)
 
 out_csv = stringr::str_glue("{args$outdir}/match_barcodes_celltypes_distribution.txt")
@@ -64,7 +69,11 @@ rna <- RunUMAP(rna, dims = 1:20)
 
 outP = stringr::str_glue("{args$outdir}/cluster_umap.png")
 png(outP, height=1000, width=1000)
-UMAPPlot(rna,group.by='seurat_clusters',label=TRUE)
+if ('seurat_clusters' %in% colnames(meta)){
+    UMAPPlot(rna,group.by='seurat_clusters',label=TRUE)
+} else {
+    UMAPPlot(rna,group.by='seurat_cluster',label=TRUE)
+}
 dev.off()
 
 outP1 = stringr::str_glue("{args$outdir}/umapplot.png")
@@ -76,7 +85,7 @@ outP2 = stringr::str_glue("{args$outdir}/assign.png")
 png(outP2, height=1000, width=1000)
 if ('new_ident' %in% colnames(meta)){
   UMAPPlot(rna,group.by='new_ident',label=TRUE,label.box=TRUE)
-}else if ('celltype' %in% colnames(meta)){
+} else if ('celltype' %in% colnames(meta)){
   UMAPPlot(rna,group.by='celltype',label=TRUE,label.box=TRUE)
 } else {
   UMAPPlot(rds,group.by='cluster',label=TRUE,label.box=TRUE)

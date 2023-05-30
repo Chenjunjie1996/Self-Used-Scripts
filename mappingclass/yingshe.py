@@ -76,14 +76,14 @@ def mapping(path, rds, sample, contig_name, celltype):
 
 
 def get_seqtype(path_list):
-    run_shell = glob.glob(f'{path_list[0]}/../*.sh')[0]
-
-    with open(run_shell) as f:
-        for line in f.readlines():
-            if 'BCR' in line:
-                return 'BCR'
-            elif 'TCR' in line:
-                return 'TCR'
+    run_shell = glob.glob(f'{path_list[0]}/../*.sh')
+    for shell in run_shell:
+        with open(shell) as f:
+            for line in f.readlines():
+                if 'BCR' in line:
+                    return 'BCR'
+                elif 'TCR' in line:
+                    return 'TCR'
 
 
 def run_count(celltype):
