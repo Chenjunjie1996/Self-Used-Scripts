@@ -79,7 +79,7 @@ if ('new_ident' %in% colnames(meta)){
 }else if ('celltype' %in% colnames(meta)){
   UMAPPlot(rna,group.by='celltype',label=TRUE,label.box=TRUE)
 } else {
-  UMAPPlot(rds,group.by='cluster',label=TRUE,label.box=TRUE)
+  UMAPPlot(rna,group.by='cluster',label=TRUE,label.box=TRUE)
 }
 dev.off()
 
