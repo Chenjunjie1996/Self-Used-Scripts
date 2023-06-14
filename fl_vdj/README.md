@@ -35,3 +35,6 @@
 ---
 ### 计算单链，双链，多链数量
 - usage: python cal_chain_cell.py T/BCR
+---
+### Add 33bp to converted r1
+- usage: python addr1.py --mapfile
