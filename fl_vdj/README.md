@@ -38,3 +38,4 @@
 ---
 ### Add 33bp to converted r1
 - usage: python addr1.py --mapfile
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230612last33bp
