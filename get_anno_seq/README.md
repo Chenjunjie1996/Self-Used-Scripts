@@ -6,3 +6,6 @@ anno_seq1.py example only keep pair productive chains with seq('CARSRAMDYW_CLQYA
 
 anno_seq2.py cell_id	clone_id	sequence_id	chain	sequence	sequence_aa\
 /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230423hsV_ratC
+
+cell_id	sequence_id	chain	c_call	v_region_seq	c_region_seq
+/SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230627AMU
