@@ -17,3 +17,5 @@
 ### split mapfile
 - usage: python /SGRNJ03/randd/cjj/Script/bulk_tcr/split_mapfile --mapfile mapfile
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj_bulk/20230424bcr_96/R230414020 
+### use plotly
+- 20230704plot
