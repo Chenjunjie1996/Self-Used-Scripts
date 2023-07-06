@@ -19,3 +19,6 @@
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj_bulk/20230424bcr_96/R230414020 
 ### use plotly
 - 20230704plot
+### calculate clonotypes(new bulk-vdj pipeline)
+- usage: python /SGRNJ03/randd/cjj/Script/bulk_tcr/count.py
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj_bulk/20230630test
