@@ -6,8 +6,8 @@ import scanpy as sc
 
 
 def split_barcode(rna_path):
-    h5ad = glob.glob(f"{rna_path}/06.analysis/*.h5ad")[0]
-    marker = glob.glob(f"{rna_path}/06.analysis/*_markers.tsv")[0]
+    h5ad = glob.glob(f"{rna_path}/*.analysis/*.h5ad")[0]
+    marker = glob.glob(f"{rna_path}/*.analysis/*_markers.tsv")[0]
     
     if not h5ad:
         raise FileNotFoundError("h5ad file not found")
