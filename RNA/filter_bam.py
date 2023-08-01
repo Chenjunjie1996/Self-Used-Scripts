@@ -47,7 +47,7 @@ class Filter_bam:
                 gene_id = read.get_tag("XT")
             except KeyError:
                 gene_id = None
-            if (reverse_complement(cb), reverse_complement(umi), gene_id) not in result:
+            if (reverse_complement(cb), reverse_complement(umi), gene_id) not in self.prime3_set:
                 self.filter_count += 1
                 out_file.write(read)
         
