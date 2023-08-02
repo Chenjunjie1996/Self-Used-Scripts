@@ -19,11 +19,16 @@ class Filter_bam:
     """
     def __init__(self, args):
         self.args = args
+        
+        # in
         self.bam3 = args.bam3
         self.bam5 = args.bam5
-        self.out_bam = args.out_bam
+        
+        # out
+        self.out_bam = f"filter_{self.bam5.split('/')[-1]}"
         self.prime3_set = set()
         self.filter_count = 0
+        self.count_file = f"{self.bam5.split('/')[-1].replace('_aligned_posSorted_addTag.bam', '')}.txt"
     
     
     def __call__(self):
@@ -47,11 +52,16 @@ class Filter_bam:
                 gene_id = read.get_tag("XT")
             except KeyError:
                 gene_id = None
-            if (reverse_complement(cb), reverse_complement(umi), gene_id) not in self.prime3_set:
-                self.filter_count += 1
+            if (reverse_complement(cb), reverse_complement(umi), gene_id) in self.prime3_set:
                 out_file.write(read)
+            else:
+                self.filter_count += 1
         
-        with open("count.txt", 'w') as fp:
+        inputFile3.close()
+        inputFile5.close()
+        out_file.close()
+        
+        with open(self.count_file, 'w') as fp:
             fp.write(f"filted read count : {self.filter_count}")
 
 
@@ -59,6 +69,5 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="filter 5-prime bam file")
     parser.add_argument("--bam3", help="3prime aligned_posSorted_addTag.bam", required=True)
     parser.add_argument("--bam5", help="5prime aligned_posSorted_addTag.bam", required=True)
-    parser.add_argument("--out_bam", help="filtered aligned_posSorted_addTag.bam", default="aligned_posSorted_addTag_filtered.bam")
     args = parser.parse_args()
     Filter_bam(args)()
