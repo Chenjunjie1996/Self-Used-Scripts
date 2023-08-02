@@ -28,6 +28,7 @@ class Filter_bam:
         self.out_bam = f"filter_{self.bam5.split('/')[-1]}"
         self.prime3_set = set()
         self.filter_count = 0
+        self.remaining_count = 0
         self.count_file = f"{self.bam5.split('/')[-1].replace('_aligned_posSorted_addTag.bam', '')}.txt"
     
     
@@ -43,7 +44,7 @@ class Filter_bam:
                 gene_id = read.get_tag("XT")
             except KeyError:
                 gene_id = None
-            self.prime3_set.add( (cb, umi, gene_id) )
+            self.prime3_set.add( (reverse_complement(cb), reverse_complement(umi), gene_id) )
         
         for read in inputFile5:
             cb = read.get_tag("CB")
@@ -52,8 +53,9 @@ class Filter_bam:
                 gene_id = read.get_tag("XT")
             except KeyError:
                 gene_id = None
-            if (reverse_complement(cb), reverse_complement(umi), gene_id) in self.prime3_set:
+            if (cb, umi, gene_id) in self.prime3_set:
                 out_file.write(read)
+                self.remaining_count += 1
             else:
                 self.filter_count += 1
         
@@ -62,7 +64,7 @@ class Filter_bam:
         out_file.close()
         
         with open(self.count_file, 'w') as fp:
-            fp.write(f"filted read count : {self.filter_count}")
+            fp.write(f"filted read count : {self.filter_count}\nremaining reads number : {self.remaining_count}")
 
 
 if __name__ == '__main__':
