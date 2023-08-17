@@ -8,4 +8,8 @@
 
 ### Filter bam file
 - usage: python filter_bam.py --bam3 --bam5
--  example: /SGRNJ06/randd/USER/cjj/celedev/rna/filter_bam/20230801
+- example: /SGRNJ06/randd/USER/cjj/celedev/rna/filter_bam/20230801
+
+### human mouse 排污
+- usage: python run.py -c 
+- example: /SGRNJ06/randd/USER/cjj/celedev/rna/human_mouse/20230815
