@@ -13,3 +13,7 @@
 ### human mouse 排污
 - usage: python run.py -c 
 - example: /SGRNJ06/randd/USER/cjj/celedev/rna/human_mouse/20230815
+
+### lncRNA umi 占比 boxplot 
+- usage python lncRNA_boxplot.py --matrix_files
+- example: /SGRNJ06/randd/USER/cjj/celedev/rna/lncRNA/script_test
