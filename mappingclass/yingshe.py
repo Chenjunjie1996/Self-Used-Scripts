@@ -12,7 +12,7 @@ import celescope.tools.utils as utils
 
 # HumanPrimaryCellAtlasData and MouseRNAseqData dataset
 CELL_TYPE_DICT = {
-    'TCR':['TCELLS', 'TCELL', 'NKTCELLS'],
+    'TCR':['TCELLS', 'TCELL', 'NKTCELLS', "TANDNK"],
     'BCR':['MATUREBCELL', 'PLASMACELLS', 'BCELLS', 'BCELL', 'PREBCELLCD34'],
     }
 ROOT_DIR = os.path.dirname(__file__)
