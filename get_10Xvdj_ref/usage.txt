@@ -6,3 +6,7 @@ example:/SGRNJ03/randd/cjj/celedev/vdj10x/20220223mkref/script/rabbit
 20230215: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230214rabbit/cr7ref/D38/03.assemble
 rabbit ref: /SGRNJ06/randd/USER/cjj/soft/refdata-cellranger-vdj-rabbit
 change imgt.py c_query2 = "14.1" to c_query2 = "7.2"
+
+pig ref: /SGRNJ06/randd/USER/cjj/ref/pig/vdj_IMGT_pig
+当服务器无法连接imgt时，需要手动下载网页(https://www.imgt.org/genedb/)，使用路径下的imgt.py脚本生成reference
+10Xvdj ref label: {"5'UTR", 'D-REGION', 'C-REGION', 'J-REGION', 'L-REGION+V-REGION'}，L-REGION+V-REGION对应为"L-PART1+V-EXON"
