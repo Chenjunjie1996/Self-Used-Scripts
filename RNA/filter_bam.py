@@ -45,6 +45,7 @@ class Filter_bam:
             except KeyError:
                 gene_id = None
             self.prime3_set.add( (reverse_complement(cb), reverse_complement(umi), gene_id) )
+            #self.prime3_set.add( (reverse_complement(cb), reverse_complement(umi)) )
             #self.prime3_set.add( (reverse_complement(cb), gene_id) )
         
         for read in inputFile5:
@@ -55,6 +56,7 @@ class Filter_bam:
             except KeyError:
                 gene_id = None
             if (cb, umi, gene_id) in self.prime3_set:
+            #if (cb, umi) in self.prime3_set:
             #if (cb, gene_id) in self.prime3_set:
                 out_file.write(read)
                 self.remaining_count += 1
