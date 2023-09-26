@@ -45,6 +45,8 @@ def get_metrics_dict(mtx_path, doublet_threshold):
         'doublet_cell_fraction': doublet_fraction,
         'median_ambient_umi_fraction': round(df['ambient_fraction'].median(),2),
         'mean_ambient_umi_fraction': round(df['ambient_fraction'].mean(),2),
+        'median_umi_human': np.median(df[df['identity'] == 'human'].human) ,
+        'median_umi_mouse': np.median(df[df['identity'] == 'mouse'].mouse)
     }
 
     return dict
