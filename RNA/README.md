@@ -17,3 +17,7 @@
 ### lncRNA umi 占比 boxplot 
 - usage python lncRNA_boxplot.py --matrix_files
 - example: /SGRNJ06/randd/USER/cjj/celedev/rna/lncRNA/script_test
+
+### read count 统计
+- usage: python read_count.py --bam3 --bam5 --cb
+- example: /SGRNJ06/randd/USER/cjj/celedev/rna/20231007read_count/
