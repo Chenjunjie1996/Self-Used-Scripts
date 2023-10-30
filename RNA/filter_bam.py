@@ -68,7 +68,7 @@ class Filter_bam:
         out_file.close()
         
         with open(self.count_file, 'w') as fp:
-            fp.write(f"filted read count : {self.filter_count}\nremaining reads number : {self.remaining_count}")
+            fp.write(f"filtered read count : {self.filter_count}\nremaining reads number : {self.remaining_count}")
 
 
 if __name__ == '__main__':
