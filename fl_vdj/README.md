@@ -42,3 +42,6 @@
 ### 统计因多条链被过滤的barcode count
 - usage: python count_multi_chain.py
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20230614
+### 检测flvCR注释文件区域是否有空值
+- usage: python region.py
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20231108by_script/Script
