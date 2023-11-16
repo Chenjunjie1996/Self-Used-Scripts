@@ -45,3 +45,6 @@
 ### 检测flvCR注释文件区域是否有空值
 - usage: python region.py
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20231108by_script/Script
+### 过滤clonotype文件，仅保留双链组合(IGH+IGK/L)
+- usage: python pair_cl.py
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20231116pair_cl
