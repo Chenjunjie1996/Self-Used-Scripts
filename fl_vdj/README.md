@@ -48,3 +48,6 @@
 ### 过滤clonotype文件，仅保留双链组合(IGH+IGK/L)
 - usage: python pair_cl.py
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20231116pair_cl
+### clonotype_id	cdr3s_aa	cdr3s_nt	barcode	contig_id	chain	fl_seq
+- usage: python combine.py
+- example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20231120/
