@@ -49,5 +49,5 @@
 - usage: python pair_cl.py
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20231116pair_cl
 ### clonotype_id	cdr3s_aa	cdr3s_nt	barcode	contig_id	chain	fl_seq
-- usage: python combine.py
+- usage: python combine.py combine_multi.py(single or multi chain clonotypes)
 - example: /SGRNJ06/randd/USER/cjj/celedev/vdj10x/20231120/
