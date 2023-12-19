@@ -9,7 +9,7 @@ def main():
             parts = line.strip().split("\t")
             gene_name = parts[-1].split('"')[1]
             del parts[-1]
-            parts.append(f'''gene_id "{gene_name}"; transcript_id "{gene_name}"; exon_number "1"; gene_name "{gene_name}"; gene_biotype "protein_coding"; transcript_name "{gene_name}"; transcript_biotype "protein_coding"; exon_id "{gene_name}";''')
+            parts.append(f'''gene_id "{gene_name}"; transcript_id "{gene_name}"; gene_name "{gene_name}"; gene_biotype "protein_coding"; transcript_name "{gene_name}"; transcript_biotype "protein_coding"; exon_id "{gene_name}";''')
             outfile.write("\t".join(parts) + "\n")
 
 if __name__ == '__main__':
