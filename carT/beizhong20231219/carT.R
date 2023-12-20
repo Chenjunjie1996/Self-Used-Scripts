@@ -36,7 +36,7 @@ df <- rds@meta.data
 df$barcode <- rownames(df)
 
 filter_df <- filter(df, barcode %in% barcodes)
-res <- table(filter_df$celltype)
+res <- table(filter_df$cluster)
 res <- as.data.frame(res)
 
 out_csv = stringr::str_glue("{args$outdir}/{args$sample}_match_barcodes_celltypes_distribution.txt")
@@ -54,7 +54,7 @@ write.table(as.data.frame(rds@meta.data), file=out.df, sep='\t')
 
 outP = stringr::str_glue("{args$outdir}/{args$sample}_cluster_umap.png")
 png(outP, height=1000, width=1000)
-UMAPPlot(rds,group.by='seurat_clusters',label=TRUE)
+UMAPPlot(rds,group.by='seurat_cluster',label=TRUE)
 dev.off()
 
 outP1 = stringr::str_glue("{args$outdir}/{args$sample}_umapplot.png")
@@ -64,8 +64,8 @@ dev.off()
 
 outP2 = stringr::str_glue("{args$outdir}/{args$sample}_assign.png")
 png(outP2, height=1000, width=1000)
-UMAPPlot(rds,group.by='celltype',label=TRUE,label.size=8)
+UMAPPlot(rds,group.by='cluster',label=TRUE,label.size=8)
 dev.off()
 
 print(res)
-print(table(meta$celltype))
+print(table(meta$cluster))
