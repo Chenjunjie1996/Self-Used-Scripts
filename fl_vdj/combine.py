@@ -20,7 +20,7 @@ def main():
         cl = cl[['clonotype_id', 'cdr3s_aa', 'cdr3s_nt']]
         
         anno = pd.read_csv(annos[i])
-        anno = anno[['barcode' ,'contig_id', "raw_clonotype_id", "chain"]]
+        anno = anno[['barcode' ,'contig_id', "raw_clonotype_id", "chain", "v_gene", "d_gene", "j_gene", "c_gene", "cdr3_nt", "cdr3"]]
     
         s1, s2 = [], []
         with pysam.FastxFile(fastas[i]) as f:
