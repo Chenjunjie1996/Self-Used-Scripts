@@ -1,0 +1,172 @@
+#!/SGRNJ/Database/script/soft/ActivePerl-5.28/bin/perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Time::Local;
+
+my $argv = @ARGV ? "@ARGV" : "-h `qselect -U $ENV{USER}| perl -pe 's/\\w+.q@(\\w+)*/\$1/'`";
+
+open FLS,"| less -S";
+select FLS;
+my @jobs;
+my @lines;
+open PID,"qhost -j -q $argv|";
+while(<PID>){
+	chomp;
+
+	if(/^sgr/){
+		my @tem = split /\s+/;
+		if(@tem == 11){
+			if(&M2G($tem[10]) > 5){
+				$_ = "$_\t [######### SWAP USED > 5G #########]";
+			}
+		}
+	}
+
+	push @lines,$_;
+	if(/^\s*(\d+)/){
+		push @jobs,$1;
+		if(@jobs >= 200){
+			&printJOBs([@lines],[@jobs]);
+			@jobs = ();
+			@lines= ();
+		}
+	}
+}
+close PID;
+
+if(@jobs){
+	&printJOBs([@lines],[@jobs])
+}
+
+sub printJOBs{
+	my ($lines,$jobids) = @_;
+	my @res = &getstats(@$jobids); 
+	my %res;
+	for(@res){
+		my ($user,$jobid,$cpu,$vf,$vmem,$mmem,$path,$vcpu,$hours) = @$_;
+		my $str = sprintf "%-10s%-9s%-9s%-10s%s", ("$cpu/$vcpu",$vmem,$mmem,$vf,$path);
+		$res{$jobid} = $str;
+	}
+	for(@$lines){
+		if(/^\s*(\d+)/){
+			$res{$1} = "" unless(defined $res{$1});
+			print "$_\t$res{$1}\n";
+		}else{
+			print "$_\n";
+		}
+	}
+}
+
+=head1 NAME
+
+vhost.pl  11/16/16 11:41:02  @novogene.com
+
+=head1 SYNOPSIS
+
+vhost.pl --help
+
+=head1 OPTIONS
+
+ --help        help
+=cut
+
+sub getstats{
+    my (@jobids) = @_;
+	my $ids = join ",",@jobids;
+
+	my @res;
+	local $/ = "\n==============================================================";
+    open FL,"qstat -j $ids 2> /dev/null |";
+    while(<FL>){
+		chomp;
+		my ($cwd,$cpu,$vf,$file,$vmem,$mmem,$path,$submit_time,$tcpu,$vcpu,$cfile,$jobid,$user);
+	    $cpu = 0;
+		$cfile = '';
+		$file = '';
+		$user = '';
+		$vcpu = 0;
+		for(split /\n/){
+			if(/^sge_o_workdir:\s+(.*)/){
+        	    $cwd = $1;
+        	}elsif(/virtual_free_quota=([^,\)\s]+)/){
+        	    $vf = $1;
+        	}
+        	if(/xproc=(\d+)/){
+        	    $cpu = $1;
+        	}elsif(/^script_file:\s+(.*)/){
+        	    $file = $1;
+        	}elsif(/^usage\s+1:\s+(.*)/){
+        	    ($tcpu,$vmem,$mmem) = $1 =~ /cpu=(.*?),.*vmem=(.*?), maxvmem=(.*)/;
+        	    $vcpu = sprintf "%0.1f",&toSec($tcpu)/timespan($submit_time);
+        	}elsif(/^job_args:\s+(.*)/){
+        	    $cfile = $1;
+        	    $cfile =~ s/\s+/ /g;
+        	}elsif(/^submission_time:\s+(.*)/){
+        	    $submit_time = $1;
+        	}elsif(/^job_number:\s+(\d+)/){
+        	    $jobid = $1;
+        	}elsif(/^owner:\s+(.*)/){
+        	    $user = $1;
+        	}
+		}
+		if($file eq '/bin/sh' or $file =~ /sge6-test.sh$/ or $file eq 'runCMD.sh'){
+    	    $cfile =~ s/^\-c[,\s]+//;
+			if($cfile =~ /^\//){
+				$path = "$cfile";
+			}else{
+				$path = "[$cwd] $cfile";
+			}
+    	}elsif($file =~ /^\//){
+			$path = $file;
+    	}else{
+    	    $path = "$cwd/$file $cfile";
+    	}
+		$vf   = M2G($vf);
+		$vmem = M2G($vmem);
+		$mmem = M2G($mmem);
+		$vf = "[$vf]" if($mmem ne '-' && $vf ne '-' && $vf < $mmem);
+
+		push @res,[$user,$jobid,$cpu,$vf,$vmem,$mmem,$path,$vcpu,(sprintf "%0.1fh",timespan($submit_time)/3600 )];
+    }
+	return @res;
+}
+
+sub M2G{
+    my %unit = qw/K 1e-6 M 1e-3 G 1 T 1e3/;
+    my ($str) = @_;
+	$str = 0 if(!defined $str or $str eq 'N/A');
+    if($str =~ /(.*)(K|M|G|T)/i){
+        return sprintf "%0.1f",$1 * $unit{uc($2)};
+    }elsif($str){
+		if($str eq '-'){
+			$str = 0;
+		}
+        return sprintf "%0.1f",$str * 1e-9;
+    }else{
+		return '-';
+	}
+}
+
+sub timespan{
+    my $start = shift;
+    my %months;
+    @months{qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)} = (0..11);
+    my ($mon,$day,$hour,$min,$sec,$year) = $start =~ /\w+\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+(\d+)/;
+    $mon = $months{$mon};
+    $year -= 1900;
+    my $epoch = timelocal($sec,$min,$hour,$day,$mon,$year);
+    return time - $epoch;
+}
+
+sub toSec{
+    my $tcpu = shift;
+    my @unit = (1,60,60*60,60*60*24);
+    my @time = split /:/,$tcpu;
+    @time = reverse @time;
+    my $sum;
+    for(0..$#time){
+        $sum += $time[$_] * $unit[$_];
+    }
+    return $sum;
+}
