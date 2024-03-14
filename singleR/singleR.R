@@ -27,10 +27,10 @@ argv <- parse_args(argv)
 
 if (argv$species == "mouse") {
     # ref = MouseRNAseqData()
-    ref = readRDS('/SGRNJ03/randd/cjj/Script/singleR/MouseRNAseqData.rds')
+    ref = readRDS('/SGRNJ06/randd/USER/cjj/Script/Self-Used-Scripts/singleR/MouseRNAseqData.rds')
 } else {
     # ref = HumanPrimaryCellAtlasData()
-    ref = readRDS('/SGRNJ03/randd/cjj/Script/singleR/HumanPrimaryCellAtlasData.rds')
+    ref = readRDS('/SGRNJ06/randd/USER/cjj/Script/Self-Used-Scripts/singleR/HumanPrimaryCellAtlasData.rds')
 }
 
 # out
