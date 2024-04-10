@@ -13,7 +13,7 @@ parser$add_argument("--outdir", help='out dir', required=TRUE)
 args <- parser$parse_args()
 
 rds <- readRDS(args$rds)
-Idents(rds) <- "orig.ident"
+Idents(rds) <- "sample"
 rds <- subset(rds,idents = c(args$sample))
 
 if (grepl("UMI.csv", args$UMI_tsne)){

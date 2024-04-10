@@ -8,7 +8,7 @@ import os
 
 def run_plot(rds, UMI_tsne, sample, outdir):
     cmd = (
-        f'Rscript /SGRNJ03/randd/cjj/Script/carT/beizhong20231219/carT.R '
+        f'Rscript /SGRNJ06/randd/USER/cjj/Script/Self-Used-Scripts/carT/beizhong20231219/carT.R '
         f'--rds {rds} '
         f'--UMI_tsne {UMI_tsne} '
         f'--sample {sample} '
