@@ -9,3 +9,11 @@
 ### Downsample 10X rawdata
 - usage: python downsample10X.py --fq_path /SGRNJ06/DATA04/23_04/2023_04_04/P22062806/B21-A/2023-04-04-174 --reads_num 8000000
 - example: /SGRNJ06/randd/PROJECT/scATAC/20230427_downsamle_sc
+
+### FragDisPlot
+- usage: python fragdisplot.py
+- example: /SGRNJ06/randd/PROJECT/scATAC/self_pipe/20240407_K562_3T3_824_sc_rr
+
+### tssPlot
+- usage: python tssplot.py mouse/human
+- example: /SGRNJ06/randd/PROJECT/scATAC/self_pipe/20240407_K562_3T3_824_sc_rr
