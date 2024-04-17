@@ -40,19 +40,23 @@ obj <- CreateSeuratObject(
 )
 
 if (grepl("mouse", args$species)){
-  db = EnsDb.Mmusculus.v79
-  gname = "mm10"
-}else{
-  db = EnsDb.Hsapiens.v86
-  gname = "hg38"
+  annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79, verbose = FALSE)
+  seqlevels(annotations) <- paste0('chr', seqlevels(annotations))
+  genome(annotations) <- "mm10"
+} else if (grepl("human", args$species)){
+  annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86, verbose = FALSE)
+  seqlevels(annotations) <- paste0('chr', seqlevels(annotations))
+  genome(annotations) <- "hg38"
+} else {
+  annotations1 <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79, verbose = FALSE)
+  annotations2 <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86, verbose = FALSE)
+  seqlevels(annotations1) <- paste0('mm10_chr', seqlevels(annotations1))
+  genome(annotations1) <- "mm10"
+  seqlevels(annotations2) <- paste0('GRCh38_chr', seqlevels(annotations2))
+  genome(annotations2) <- "hg38"
+  grl = GRangesList(annotations1, annotations2)
+  annotations = unlist(as(grl, "GRangesList"))
 }
-# extract gene annotations from EnsDb
-annotations <- GetGRangesFromEnsDb(ensdb = db)
-
-# change to UCSC style since the data was mapped to hg19
-seqlevels(annotations) <- paste0('chr', seqlevels(annotations))
-genome(annotations) <- gname
-
 # add the gene information to the object
 Annotation(obj) <- annotations
 
@@ -61,10 +65,10 @@ obj <- TSSEnrichment(obj, fast = FALSE)
 
 outP1 = stringr::str_glue("{args$outdir}/{args$sample}.png")
 png(outP1, height=700, width=700)
-TSSPlot(brain) + NoLegend() + ggtitle("Enrichment around TSS")
+TSSPlot(obj) + NoLegend() + ggtitle("Enrichment around TSS")
 dev.off()
 
-df = as.data.frame(brain@assays$peaks@positionEnrichment)
+df = as.data.frame(obj@assays$peaks@positionEnrichment)
 tss_score = max(colMeans(df))
 
 out.df = stringr::str_glue("{args$outdir}/{args$sample}_TssScore.txt")

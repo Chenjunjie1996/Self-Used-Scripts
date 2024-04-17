@@ -28,7 +28,7 @@ def main():
     species = sys.argv[1]
     
     outdir = 'TssPlot'
-    check_mkdir('outdir')
+    check_mkdir(outdir)
     
     dir_list = glob.glob('*/outs')
     sample_list = [i.split('/')[0] for i in dir_list]
