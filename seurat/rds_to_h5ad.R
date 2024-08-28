@@ -14,6 +14,7 @@ outdat <- gsub('rds$', 'h5ad', indat)
 seurat <- readRDS(indat)
 seurat@meta.data$cluster <- Idents(seurat)
 
+Sys.setenv(RETICULATE_PYTHON = "/SGRNJ/Public/Software/conda_env/CeleScanpz/bin/python")
 sc <- import("scanpy")
 adata_seurat <- sc$AnnData(
     X   = t(GetAssayData(seurat)),
