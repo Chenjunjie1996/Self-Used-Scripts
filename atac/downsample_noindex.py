@@ -77,7 +77,7 @@ class Downsample:
                 pysam.FastxFile(self.fq2, persist=False) as fq2, \
                     pysam.FastxFile(self.fq3, persist=False) as fq3:
 
-            for entry1, entry2, entry3, entry4 in zip(fq1, fq2, fq3):
+            for entry1, entry2, entry3 in zip(fq1, fq2, fq3):
                 count += 1
                 if count > self.args.reads_num:
                     break
