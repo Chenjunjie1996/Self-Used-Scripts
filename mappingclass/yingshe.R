@@ -24,6 +24,8 @@ if (grepl("confident_count.tsv", args$VDJ)){
   vdj <- read.table(args$VDJ, sep=',', header=T)
 }
 
+# 转录组和VDJ版本不匹配情况
+# vdj$barcode <- str_replace_all(vdj$barcode, "_", "")
 df <- rna@meta.data
 df$barcode <- rownames(df)
 
