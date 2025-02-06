@@ -17,3 +17,7 @@
 ### tssPlot
 - usage: python tssplot.py mouse/human
 - example: /SGRNJ06/randd/PROJECT/scATAC/self_pipe/20240407_K562_3T3_824_sc_rr
+
+### convert(multi_omics)
+- usage: python convert.py --atac_path --rna_path
+- example: /SGRNJ06/randd/USER/cjj/celedev/atac/20250206multi_omics
