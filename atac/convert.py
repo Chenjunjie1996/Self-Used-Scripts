@@ -84,14 +84,14 @@ class Convert:
         
         self.atac_fq1, self.atac_fq2, self.atac_fq3 = self.atac_fq_list[0], self.atac_fq_list[1], self.atac_fq_list[2]
         self.rna_fq2 = self.rna_fq_list[0]
-        self.atac_sample = self.atac_fq1.split("/")[-1].replace(".fq", "")
-        self.rna_sample = self.rna_fq2.split('/')[-1].replace(".fq", "")
+        self.atac_sample = self.atac_fq2.split("/")[-1].replace("_2.fq", "")
+        self.rna_sample = self.rna_fq2.split('/')[-1].replace("_2.fq", "")
         self.atac_out_fq1 = f'{self.atac_outdir}/{self.atac_sample}_S1_L001_R1_001.fastq.gz'
         self.atac_out_fq2 = f'{self.atac_outdir}/{self.atac_sample}_S1_L001_R2_001.fastq.gz'
         self.atac_out_fq3 = f'{self.atac_outdir}/{self.atac_sample}_S1_L001_R3_001.fastq.gz'
         self.rna_out_fq1 = f'{self.rna_outdir}/{self.rna_sample}_S1_L001_R1_001.fastq.gz'
         self.rna_out_fq2 = f'{self.rna_outdir}/{self.rna_sample}_S1_L001_R2_001.fastq.gz'
-        self.barcode_convert_json = f'{self.atac_outdir}/barcode_convert.json'
+        self.barcode_convert_json = f'{self.rna_outdir}/barcode_convert.json'
     
     @add_log
     def gen_sgr_tenX_dict(self):
