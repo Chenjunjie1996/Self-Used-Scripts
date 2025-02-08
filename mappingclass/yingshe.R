@@ -40,9 +40,10 @@ barcodes <- unique(cells$barcode)
 filter_df <- filter(df, barcode %in% barcodes)
 if ('seurat_clusters' %in% colnames(filter_df)){
     res <- table(filter_df$seurat_clusters)
-
-} else {
+} else if ('seurat_cluster' %in% colnames(filter_df)){
     res <- table(filter_df$seurat_cluster)
+} else {
+    res <- table(filter_df$raw_cluster)
 }
 res <- as.data.frame(res)
 
@@ -73,8 +74,10 @@ outP = stringr::str_glue("{args$outdir}/cluster_umap.png")
 png(outP, height=1000, width=1000)
 if ('seurat_clusters' %in% colnames(meta)){
     UMAPPlot(rna,group.by='seurat_clusters',label=TRUE)
+} else if ('seurat_cluster' %in% colnames(meta)){
+  UMAPPlot(rna,group.by='seurat_cluster',label=TRUE,label.box=TRUE)
 } else {
-    UMAPPlot(rna,group.by='seurat_cluster',label=TRUE)
+    UMAPPlot(rna,group.by='raw_cluster',label=TRUE)
 }
 dev.off()
 
