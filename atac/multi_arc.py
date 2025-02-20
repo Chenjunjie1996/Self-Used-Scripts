@@ -149,7 +149,7 @@ job_end
             fh.write(f"""job_begin
     name convert_{sample}
     sched_options -w n -cwd -V -l vf=5g,p=1
-    cmd source activate cjj_atac; python /SGRNJ06/randd/USER/cjj/Script/Self-Used-Scripts/atac/convert.py --rna_path ./{sample}/rna_dir/01.barcode/ --atac_path ./{sample}/atac_dir/01.barcode/ --outdir ./{sample}/convert
+    cmd source activate cjj_atac; python /SGRNJ06/randd/USER/cjj/Script/Self-Used-Scripts/atac/convert.py --rna_path ./{sample}/rna_dir/01.barcode/ --atac_path ./{sample}/atac_dir/01.barcode/ --outdir ./{sample}/convert --sample {sample}
 job_end
 
 job_begin
