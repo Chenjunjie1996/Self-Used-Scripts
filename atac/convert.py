@@ -66,7 +66,7 @@ class Convert:
     """Convert barcodes to 10X format."""
     def __init__(self, args):
         self.args = args
-        self.atac_fq_list = glob.glob(f"{self.args.atac_path}/*.fq")
+        self.atac_fq_list = glob.glob(f"{self.args.atac_path}/*.fastq")
         self.rna_fq_list = glob.glob(f"{self.args.rna_path}/*.fq")
         self.atac_fq_list = sorted([i for i in self.atac_fq_list if os.path.isfile(i)])
         self.rna_fq_list = sorted([i for i in self.rna_fq_list if os.path.isfile(i)])
@@ -84,13 +84,13 @@ class Convert:
         
         self.atac_fq1, self.atac_fq2, self.atac_fq3 = self.atac_fq_list[0], self.atac_fq_list[1], self.atac_fq_list[2]
         self.rna_fq2 = self.rna_fq_list[0]
-        self.atac_sample = self.atac_fq2.split("/")[-1].replace("_2.fq", "")
-        self.rna_sample = self.rna_fq2.split('/')[-1].replace("_2.fq", "")
-        self.atac_out_fq1 = f'{self.atac_outdir}/{self.atac_sample}_S1_L001_R1_001.fastq.gz'
-        self.atac_out_fq2 = f'{self.atac_outdir}/{self.atac_sample}_S1_L001_R2_001.fastq.gz'
-        self.atac_out_fq3 = f'{self.atac_outdir}/{self.atac_sample}_S1_L001_R3_001.fastq.gz'
-        self.rna_out_fq1 = f'{self.rna_outdir}/{self.rna_sample}_S1_L001_R1_001.fastq.gz'
-        self.rna_out_fq2 = f'{self.rna_outdir}/{self.rna_sample}_S1_L001_R2_001.fastq.gz'
+        self.sample = self.args.sample
+
+        self.atac_out_fq1 = f'{self.atac_outdir}/{self.sample}_S1_L001_R1_001.fastq.gz'
+        self.atac_out_fq2 = f'{self.atac_outdir}/{self.sample}_S1_L001_R2_001.fastq.gz'
+        self.atac_out_fq3 = f'{self.atac_outdir}/{self.sample}_S1_L001_R3_001.fastq.gz'
+        self.rna_out_fq1 = f'{self.rna_outdir}/{self.sample}_S1_L001_R1_001.fastq.gz'
+        self.rna_out_fq2 = f'{self.rna_outdir}/{self.sample}_S1_L001_R2_001.fastq.gz'
         self.barcode_convert_json = f'{self.rna_outdir}/barcode_convert.json'
     
     @add_log
@@ -212,6 +212,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Convert fastq to 10X")
     parser.add_argument("--atac_path", help="atac_path", required=True)
     parser.add_argument("--rna_path", help="atac_path", required=True)
+    parser.add_argument("--sample", help="sample name", required=True)
     parser.add_argument("--outdir", help="output_dir", default='convert_dir')
     args = parser.parse_args()
     Convert(args)()
