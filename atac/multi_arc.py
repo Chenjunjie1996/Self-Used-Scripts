@@ -155,7 +155,7 @@ job_end
 job_begin
     name arc_{sample}
     sched_options -w n -cwd -V -l vf=20g,p=4
-    cmd /SGRNJ06/randd/PROJECT/scATAC_scRNA_multiOmics/scRNA/cell_ranger_test/multi_omics/cellranger-arc-2.0.2/cellranger-arc count --id={sample} --reference={reference} --libraries=./{sample}/cr_arc/libraries.csv  --localcores=4 --localmem=20 --min-atac-count 100 --min-gex-count 100
+    cmd cd ./{sample}/cr_arc; /SGRNJ06/randd/PROJECT/scATAC_scRNA_multiOmics/scRNA/cell_ranger_test/multi_omics/cellranger-arc-2.0.2/cellranger-arc count --id={sample} --reference={reference} --libraries=./libraries.csv  --localcores=4 --localmem=20 --min-atac-count 100 --min-gex-count 100
 job_end
 
 order atac_barcode_{sample} after atac_sample_{sample}
