@@ -1,6 +1,6 @@
 import argparse
 import pysam
-
+import pandas as pd
 
 class Filter_bam:
     """
@@ -10,6 +10,7 @@ class Filter_bam:
         
         # in
         self.bam = args.bam
+        self.bclist = args.bclist
         
         # out
         self.set3 = set()
@@ -24,6 +25,8 @@ class Filter_bam:
     
     
     def __call__(self):
+        df = pd.read_csv(self.bclist,names=['bc'])
+        cell_bc = set(df.bc)
         inbam = pysam.AlignmentFile(self.bam, "rb")
         
         for read in inbam:
@@ -33,10 +36,12 @@ class Filter_bam:
             self.total_count += 1
             if judge == '5p':
                 self.count5 += 1
-                self.set5.add( (cb, umi) )
+                if cb in cell_bc:
+                    self.set5.add( (cb, umi) )
             else:
                 self.count3 += 1
-                self.set3.add( (cb, umi) )
+                if cb in cell_bc:
+                    self.set3.add( (cb, umi) )
         self.intersec_count = len(self.set5.intersection(self.set3))
                 
         inbam.close()
@@ -45,9 +50,9 @@ class Filter_bam:
             fp.write(f"total read count : {self.total_count}\n")
             fp.write(f"3p read count : {self.count3}\n")
             fp.write(f"5p read count : {self.count5}\n")
-            fp.write(f"3p bc_umi combination : {len(self.set3)}\n")
-            fp.write(f"5p bc_umi combination : {len(self.set5)}\n")
-            fp.write(f"3p5p bc_umi intersection : {self.intersec_count}\n")
+            fp.write(f"3p cell bc_umi combination : {len(self.set3)}\n")
+            fp.write(f"5p cell bc_umi combination : {len(self.set5)}\n")
+            fp.write(f"3p5p cell bc_umi intersection : {self.intersec_count}\n")
         
         
         for i in self.set3:
@@ -63,5 +68,6 @@ class Filter_bam:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("--bam", help="bam file", required=True)
+    parser.add_argument("--bclist", help="cell barcode file", required=True)
     args = parser.parse_args()
     Filter_bam(args)()
