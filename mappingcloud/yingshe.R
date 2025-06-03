@@ -14,8 +14,8 @@ args <- parser$parse_args()
 
 rds <- readRDS(args$rds)
 
-Idents(rds) <- "orig.ident"
-#Idents(rds) <- "sample"
+#Idents(rds) <- "orig.ident"
+Idents(rds) <- 'Sample ID'
 rna <- subset(rds,idents = c(args$sample))
 
 if (grepl("confident_count.tsv", args$VDJ)){
