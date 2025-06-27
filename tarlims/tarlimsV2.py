@@ -26,11 +26,11 @@ def parse_mapfile(mapfile):
         patt = r'_matrix_10X.tar'
         sample = re.sub(patt, "", matrix)
         
-        target_matrix_path = os.path.abspath(f"./match_dir/{sample}/05.count/{sample}_matrix_10X")
+        target_matrix_path = os.path.abspath(f"./match_dir/{sample}/outs/filtered")
         deal_matrix_file(tar_path, target_matrix_path)
         
-        analysis_path = glob.glob(f"{i}/*/*/06.analysis*")[0]
-        target_analysis_path = os.path.abspath(f"./match_dir/{sample}/06.analysis")
+        analysis_path = f"{i}/call-analysis/*/"
+        target_analysis_path = os.path.abspath(f"./match_dir/{sample}/02.analysis")
         deal_analysis_file(analysis_path, target_analysis_path)
         
         new_lims_path_list.append('/'.join(target_matrix_path.split('/')[:-2]))
